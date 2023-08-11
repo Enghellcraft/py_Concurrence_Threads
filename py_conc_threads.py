@@ -8,26 +8,38 @@ import threading
 import time
 
 # Global Variables
-ganador = ""
+ganador = None
+numeroAleatorio = random.randint(1,10)
+distanciaAMeta = 20
+cantidadInicialCaballos = 10
 caballos = []
 distancias = []
 
 # Thread & Functions
 
 def participar():
-    print()
+    posicion = 0
+    while ganador is None:
+        # Pausa accion por un segundo para evitar que sea muy rapido
+        time.sleep(1)
+        posicion += numeroAleatorio
+        if posicion >= distanciaAMeta:
+            # agregar las cosas aca
+            break
+    
     
 def threadingStart():
-    for i in range(caballos.len()):
+    for i in range(cantidadInicialCaballos):
         p = threading.Thread(target=participar)
         p.start()
+        
         
 def threadingJoin():
     for i in range(caballos.len()):
         #p.join()
         print()
         
-def ganador():
+def caballoGanador():
     print(f"El ganador es: {ganador}")
 
 #  null) Task + Pres
@@ -38,7 +50,7 @@ print("*************************************************************************
 print("    ALUMNOS:                                                                      ")
 print("            • Bardales, Wilfredo                                                  ")
 print("            • Martin, Denise                                                      ")
-print("            • Paliari, Crolina                                                    ")
+print("            • Paleari, Carolina                                                    ")
 print("                                                                                  ")
 print("**********************************************************************************")
 print("*                                   OBJETIVO                                     *")
@@ -55,6 +67,7 @@ print("  2- Definir una distancia de 20.                                        
 print("  3- Todos los caballos corren moviendose en saltos 1 a 1, o aleatorios.          ")
 print("  4- Sólo un caballo puede ganar, y cuando lo ahce deben frenarse todos los demás.")
 print("                                                                                  ")
+
 #  I) Theory
 print("                                                                                  ")
 print("**********************************************************************************")
@@ -86,6 +99,8 @@ print("                                                                         
 threadingStart()
 
 threadingJoin()
+
+caballoGanador()
     
 # III)  Conclusions
 print("**********************************************************************************")
