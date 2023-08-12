@@ -15,31 +15,30 @@ print_lock = threading.Lock()
 
 # Functions
 def avanzar_caballo(nombre, distancia_recorrida, distancia_total, ganador_event, ganadores_historico):
-    while distancia_recorrida < distancia_total:
+    while (distancia_recorrida < distancia_total):
         if ganador_event.is_set():
-            if print_lock.acquire(blocking=False):  # Devuelve false si ya esta lockeado
-                print("\n*--------** La Carrera Termino **--------*")
-                # Quita el lock
-                print_lock.release()  
             return
         #salto = random.randint(1, 6)
-        salto = 1
+        salto = 4
         if (distancia_recorrida + salto) >= distancia_total:
-            distancia_recorrida = distancia_total 
-        else:
+            distancia_recorrida = distancia_total
+            # Detener a los otros caballos
+            ganador_event.set()
+            if print_lock.acquire(blocking=False):  # Devuelve false si ya esta lockeado
+                print("\n*--------** La Carrera Termino **--------*")
+                print("\nTenemos un Ganador!!")
+                print(f"\n{nombre} ganó!")
+                # Quita el lock
+                print_lock.release()
+                ganadores_historico.append(nombre)   
+            return 
+        else :
             distancia_recorrida += salto
-            
-        print(f"{nombre} ha recorrido {distancia_recorrida} metros.")
-    
-    if not ganador_event.is_set():
-        ganador_event.set()
-        print("\nTenemos un Ganador!!")
-        print(f"\n{nombre} gano!")
-        ganadores_historico.append(nombre)
-        # Detener a los otros caballos
-        
+            if not ganador_event.is_set():
+                print(f"{nombre} ha recorrido {distancia_recorrida} metros.")
 
 def carrera(distancia_total):
+    
     print("\n*--------** Comienza la Carrera!! **--------*")
     while True:
         caballos = []
