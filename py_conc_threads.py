@@ -36,6 +36,7 @@ def avanzar_caballo(nombre, distancia_recorrida, distancia_total, ganador_event,
             distancia_recorrida += salto
             if not ganador_event.is_set():
                 print(f"{nombre} ha recorrido {distancia_recorrida} metros.")
+        time.sleep(0.8) # Timer para evitar impresiones fuera de lugar     
 
 def carrera(distancia_total):
     
