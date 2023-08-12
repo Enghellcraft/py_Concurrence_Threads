@@ -6,41 +6,73 @@
 import random
 import threading
 import time
+import matplotlib.pyplot as plt
+from collections import Counter
 
-# Global Variables
-ganador = None
-numeroAleatorio = random.randint(1,10)
-distanciaAMeta = 20
-cantidadInicialCaballos = 10
-caballos = []
-distancias = []
-
-# Thread & Functions
-
-def participar():
-    posicion = 0
-    while ganador is None:
-        # Pausa accion por un segundo para evitar que sea muy rapido
-        time.sleep(1)
-        posicion += numeroAleatorio
-        if posicion >= distanciaAMeta:
-            # agregar las cosas aca
-            break
+def avanzar_caballo(nombre, distancia_recorrida, distancia_total, ganador, ganadores_historico):
+    while distancia_recorrida < distancia_total and not ganador.is_set():
+        salto = random.randint(1, 3)
+        distancia_recorrida += salto
+        print(f"{nombre} ha recorrido {distancia_recorrida} metros.")
     
+    if not ganador.is_set():
+        ganador.set()
+        print(f"{nombre} gano")
+        ganadores_historico.append(nombre)
+
+def carrera(distancia_total):
+    while True:
+        caballos = []
+        ganador = threading.Event()
+        ganadores_historico = []
+
+        for i in range(1, 11):
+            distancia_recorrida = 0
+            caballo_thread = threading.Thread(target=avanzar_caballo, args=(f"Caballo {i}", distancia_recorrida, distancia_total, ganador, ganadores_historico))
+            caballos.append(caballo_thread)
+
+        for caballo in caballos:
+            caballo.start()
+
+        for caballo in caballos:
+            caballo.join()
+
+        if ganadores_historico:
+            return ganadores_historico[-1]  # Devolver el último ganador
+
+def main():
+    distancia_total = 20
+    carreras = 100
+
+    ganadores_historicos = []
+
+    for _ in range(carreras):
+        ganador = carrera(distancia_total)
+        if ganador:
+            ganadores_historicos.append(ganador)
     
-def threadingStart():
-    for i in range(cantidadInicialCaballos):
-        p = threading.Thread(target=participar)
-        p.start()
-        
-        
-def threadingJoin():
-    for i in range(caballos.len()):
-        #p.join()
-        print()
-        
-def caballoGanador():
-    print(f"El ganador es: {ganador}")
+    print(ganadores_historicos)
+
+    # Contar las victorias de cada caballo
+    conteo_victorias = Counter(ganadores_historicos)
+    nombres_caballos = [f"Caballo {i}" for i in range(1, 11)]  # Crear lista con nombres de caballos del 1 al 10
+    victorias = [conteo_victorias[nombre] for nombre in nombres_caballos]
+
+    # Crear el gráfico de barras
+    plt.figure(figsize=(10, 6))
+    plt.bar(nombres_caballos, victorias, alpha=0.7)
+    plt.xlabel('Caballo')
+    plt.ylabel('Cantidad de Victorias')
+    plt.title('Distribución de Victorias en Carreras de Caballos')
+    plt.xticks(rotation=45)
+    plt.tight_layout()
+
+    plt.show()
+
+
+if __name__ == "__main__":
+    main()
+
 
 #  null) Task + Pres
 print("                                                                                  ")
@@ -95,12 +127,6 @@ print("*************************************************************************
 print("*                               CARRERA DE CABALLOS                              *")
 print("**********************************************************************************")
 print("                                                                                  ")
-
-threadingStart()
-
-threadingJoin()
-
-caballoGanador()
     
 # III)  Conclusions
 print("**********************************************************************************")
