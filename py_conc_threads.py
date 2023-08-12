@@ -9,26 +9,33 @@ import time
 import matplotlib.pyplot as plt
 from collections import Counter
 
-def avanzar_caballo(nombre, distancia_recorrida, distancia_total, ganador, ganadores_historico):
-    while distancia_recorrida < distancia_total and not ganador.is_set():
-        salto = random.randint(1, 3)
+def avanzar_caballo(nombre, distancia_recorrida, distancia_total, ganador_event, ganadores_historico):
+    while distancia_recorrida < distancia_total:
+        if ganador_event.is_set():
+            print("hay ganador, salgo")
+            return
+        #salto = random.randint(1, 3)
+        salto = 1
         distancia_recorrida += salto
         print(f"{nombre} ha recorrido {distancia_recorrida} metros.")
     
-    if not ganador.is_set():
-        ganador.set()
-        print(f"{nombre} gano")
+    if not ganador_event.is_set():
+        ganador_event.set()
+        print(f"{nombre} gano \n")
         ganadores_historico.append(nombre)
+        # Detener a los otros caballos
+        ganador_event.set()
+
 
 def carrera(distancia_total):
     while True:
         caballos = []
-        ganador = threading.Event()
+        ganador_event = threading.Event()
         ganadores_historico = []
 
         for i in range(1, 11):
             distancia_recorrida = 0
-            caballo_thread = threading.Thread(target=avanzar_caballo, args=(f"Caballo {i}", distancia_recorrida, distancia_total, ganador, ganadores_historico))
+            caballo_thread = threading.Thread(target=avanzar_caballo, args=(f"Caballo {i}", distancia_recorrida, distancia_total, ganador_event, ganadores_historico))
             caballos.append(caballo_thread)
 
         for caballo in caballos:
@@ -42,7 +49,7 @@ def carrera(distancia_total):
 
 def main():
     distancia_total = 20
-    carreras = 100
+    carreras = 10
 
     ganadores_historicos = []
 
