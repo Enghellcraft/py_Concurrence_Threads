@@ -9,13 +9,21 @@ import time
 import matplotlib.pyplot as plt
 from collections import Counter
 
+# Global Variables
+# Generación de lock para evitar reimpresion por cada thread de: "Tenemos un Ganador!"
+print_lock = threading.Lock()
+
+# Functions
 def avanzar_caballo(nombre, distancia_recorrida, distancia_total, ganador_event, ganadores_historico):
     while distancia_recorrida < distancia_total:
         if ganador_event.is_set():
-            print("hay ganador, salgo")
+            if print_lock.acquire(blocking=False):  # Devuelve false si ya esta lockeado
+                print("La Carrera Termino.")
+                print("Tenemos un Ganador!!")
+                print_lock.release()  # Quita el lock
             return
-        #salto = random.randint(1, 3)
-        salto = 1
+        salto = random.randint(1, 6)
+        #salto = 1
         distancia_recorrida += salto
         print(f"{nombre} ha recorrido {distancia_recorrida} metros.")
     
@@ -26,8 +34,8 @@ def avanzar_caballo(nombre, distancia_recorrida, distancia_total, ganador_event,
         # Detener a los otros caballos
         ganador_event.set()
 
-
 def carrera(distancia_total):
+    print("\nComienza la Carrera!!")
     while True:
         caballos = []
         ganador_event = threading.Event()
@@ -75,11 +83,6 @@ def main():
     plt.tight_layout()
 
     plt.show()
-
-
-if __name__ == "__main__":
-    main()
-
 
 #  null) Task + Pres
 print("                                                                                  ")
@@ -134,6 +137,9 @@ print("*************************************************************************
 print("*                               CARRERA DE CABALLOS                              *")
 print("**********************************************************************************")
 print("                                                                                  ")
+   
+if __name__ == "__main__":
+    main()   
     
 # III)  Conclusions
 print("**********************************************************************************")
