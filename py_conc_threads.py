@@ -19,12 +19,16 @@ def avanzar_caballo(nombre, distancia_recorrida, distancia_total, ganador_event,
         if ganador_event.is_set():
             if print_lock.acquire(blocking=False):  # Devuelve false si ya esta lockeado
                 print("\n*--------** La Carrera Termino **--------*")
-
-                print_lock.release()  # Quita el lock
+                # Quita el lock
+                print_lock.release()  
             return
         salto = random.randint(1, 6)
         #salto = 1
-        distancia_recorrida += salto
+        # Validacion para pasos Aleatorios
+        if (distancia_recorrida + salto) < distancia_total:
+            distancia_recorrida += salto
+        else:
+            distancia_recorrida = 20
         print(f"{nombre} ha recorrido {distancia_recorrida} metros.")
     
     if not ganador_event.is_set():
@@ -49,7 +53,7 @@ def carrera(distancia_total):
 
         for caballo in caballos:
             caballo.start()
-
+            
         for caballo in caballos:
             caballo.join()
 
@@ -58,7 +62,7 @@ def carrera(distancia_total):
 
 def main():
     distancia_total = 20
-    carreras = 10
+    carreras = 6
 
     ganadores_historicos = []
 
@@ -74,6 +78,7 @@ def main():
     nombres_caballos = [f"Caballo {i}" for i in range(1, 11)]  # Crear lista con nombres de caballos del 1 al 10
     victorias = [conteo_victorias[nombre] for nombre in nombres_caballos]
 
+    # Plot
     # Crear el gráfico de barras
     plt.figure(figsize=(10, 6))
     plt.bar(nombres_caballos, victorias, alpha=0.7)
