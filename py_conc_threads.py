@@ -18,8 +18,8 @@ def avanzar_caballo(nombre, distancia_recorrida, distancia_total, ganador_event,
     while (distancia_recorrida < distancia_total):
         if ganador_event.is_set():
             return
-        #salto = random.randint(1, 6)
-        salto = 4
+        salto = random.randint(1, 6)
+        #salto = 1
         if (distancia_recorrida + salto) >= distancia_total:
             distancia_recorrida = distancia_total
             # Detener a los otros caballos
@@ -27,11 +27,11 @@ def avanzar_caballo(nombre, distancia_recorrida, distancia_total, ganador_event,
             if print_lock.acquire(blocking=False):  # Devuelve false si ya esta lockeado
                 print("\n*--------** La Carrera Termino **--------*")
                 print("\nTenemos un Ganador!!")
-                print(f"\n{nombre} ganó!")
+                print(f"\n{nombre} ganó!\n")
                 # Quita el lock
                 print_lock.release()
                 ganadores_historico.append(nombre)   
-            return 
+                return 
         else :
             distancia_recorrida += salto
             if not ganador_event.is_set():
@@ -53,8 +53,9 @@ def carrera(distancia_total):
         for caballo in caballos:
             caballo.start()
 
+        ganador_event.wait() # Espera el evento del caballo ganador
         for caballo in caballos:
-            caballo.join()
+            caballo.join(0.1) # Termina el thread donde sea que este
 
         if ganadores_historico:
             return ganadores_historico[-1]  # Devolver el último ganador
