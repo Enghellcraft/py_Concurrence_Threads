@@ -22,22 +22,22 @@ def avanzar_caballo(nombre, distancia_recorrida, distancia_total, ganador_event,
                 # Quita el lock
                 print_lock.release()  
             return
-        salto = random.randint(1, 6)
-        #salto = 1
-        # Validacion para pasos Aleatorios
-        if (distancia_recorrida + salto) < distancia_total:
-            distancia_recorrida += salto
+        #salto = random.randint(1, 6)
+        salto = 1
+        if (distancia_recorrida + salto) >= distancia_total:
+            distancia_recorrida = distancia_total 
         else:
-            distancia_recorrida = 20
+            distancia_recorrida += salto
+            
         print(f"{nombre} ha recorrido {distancia_recorrida} metros.")
     
     if not ganador_event.is_set():
         ganador_event.set()
         print("\nTenemos un Ganador!!")
-        print(f"{nombre} gano! \n")
+        print(f"\n{nombre} gano!")
         ganadores_historico.append(nombre)
         # Detener a los otros caballos
-        ganador_event.set()
+        
 
 def carrera(distancia_total):
     print("\n*--------** Comienza la Carrera!! **--------*")
@@ -53,7 +53,7 @@ def carrera(distancia_total):
 
         for caballo in caballos:
             caballo.start()
-            
+
         for caballo in caballos:
             caballo.join()
 
@@ -158,5 +158,7 @@ print("  ejecutados; por eso se seleccionó el sistema aleatorio de pasos por ca
 print("  disminuir esta leve probabilidad.                                               ")
 print("                                                                                  ")
 print("  El uso de threads aquí, muestra que la falta de prioridad en una concurrencia,  ")
-print("  resulta en un sistema indeterminado de posibles salidas del proceso.            ")
+print("  resulta en un sistema indeterminado de posibles salidas del proceso, donde,     ")
+print("  siendo n la cantidad de threads, cada thread tiene una probabilidad de 1/n * 100%")
+print("  de salir ganador (considerando casos ideales).                                  ")
 print("                                                                                  ")
