@@ -24,11 +24,12 @@ def avanzar_caballo(nombre, distancia_recorrida, distancia_total, ganador_event,
             distancia_recorrida = distancia_total
             # Detener a los otros caballos
             ganador_event.set()
-            if print_lock.acquire(blocking=False):  # Devuelve false si ya esta lockeado
+            # Uso de lock para impresión única del término de carrera, como SEMAFORO para sección critca
+            if print_lock.acquire(blocking=False):  # Devuelve false si ya esta lockeado. // WAIT
                 print("\n*--------** La Carrera Termino **--------*")
                 print("\nTenemos un Ganador!!")
                 print(f"\n{nombre} ganó!\n")
-                # Quita el lock
+                # Quita el lock // SIGNAL
                 print_lock.release()
                 ganadores_historico.append(nombre)   
                 return 
@@ -36,14 +37,15 @@ def avanzar_caballo(nombre, distancia_recorrida, distancia_total, ganador_event,
             distancia_recorrida += salto
             if not ganador_event.is_set():
                 print(f"{nombre} ha recorrido {distancia_recorrida} metros.")
-                race_progress.append((nombre, distancia_recorrida))  # Store horse progress
+                # Guarda el progreso del caballo
+                race_progress.append((nombre, distancia_recorrida)) 
         time.sleep(0.8) # Timer para evitar impresiones fuera de lugar     
 
 def carrera(distancia_total, race_count):
     
     print(f"\n*--------** Comienza la Carrera {race_count}!! **--------*")
     
-    # Variables to store horse progress
+    # Lista de progreso de pasos por caballo
     race_progress = []
     
     while True:
@@ -64,7 +66,8 @@ def carrera(distancia_total, race_count):
             caballo.join(0.1) # Termina el thread donde sea que este
 
         if ganadores_historico:
-            # Plot horse progress
+            # Plot
+            # Progreso de caballos
             fig, ax = plt.subplots(figsize=(6, 6))
             for horse, progress in race_progress:
                 ax.plot(range(1, progress + 1), [horse] * progress, label=horse)
@@ -81,6 +84,7 @@ def main():
     distancia_total = 20
     carreras = 6
 
+    # Lista de ganadores por cada carrera
     ganadores_historicos = []
 
     for race_count in range(1, carreras + 1):
@@ -88,11 +92,13 @@ def main():
         if ganador:
             ganadores_historicos.append(ganador)
     
+    print("Los Ganadores Historicos son:")
     print(ganadores_historicos)
 
     # Contar las victorias de cada caballo
     conteo_victorias = Counter(ganadores_historicos)
-    nombres_caballos = [f"Caballo {i}" for i in range(1, 11)]  # Crear lista con nombres de caballos del 1 al 10
+    # Imprime lista con nombres de caballos del 1 al 10
+    nombres_caballos = [f"Caballo {i}" for i in range(1, 11)]  
     victorias = [conteo_victorias[nombre] for nombre in nombres_caballos]
 
     # Plot
@@ -127,10 +133,23 @@ print("*                                   CONSIGNAS                            
 print("**********************************************************************************")
 print("                                                                                  ")
 print("  CARRERA DE CABALLOS:                                                            ")
+print("  Implementar una 'carrera de caballos' usando threads, donde cada 'caballo' es un")
+print("  Thread o bien un objeto de una clase que sea sub clase de Thread, y contendrá   ")
+print("  una posición dada por un número entero. El ciclo de vida de este objeto es      ")
+print("  incrementar la posición en variados instantes de tiempo, mientras no haya llegado")
+print("  a la meta, la cual es simplemente un entero prefijado. Una vez que un caballo   ")
+print("  llegue a la meta, se debe informar en pantalla cuál fue el ganador, luego de lo ")
+print("  cual los demás caballos no deberán seguir corriendo. Imprimir durante todo el   ")
+print("  ciclo las posiciones de los caballos, o bien de alguna manera el camino que va  ")
+print("  recorriendo cada uno (usando símbolos Ascii). El programa podría producir un    ")
+print("  ganador disitnto cada vez que se corra. Opcionalmente, extender el funcionamiento")
+print("  a un array de n caballos, donde n puede ser un parámetro.                       ")
+print("  Puntos a Cumplir:                       ")
 print("  1- Definir  10 caballos para correr una carrera, cada caballo es un thread.     ")
 print("  2- Definir una distancia de 20.                                                 ")
 print("  3- Todos los caballos corren moviendose en saltos 1 a 1, o aleatorios.          ")
 print("  4- Sólo un caballo puede ganar, y cuando lo ahce deben frenarse todos los demás.")
+print("  5- Implementar un semáforo con lock de Thread para limitar la sección crìtica.  ")
 print("                                                                                  ")
 
 #  I) Theory
@@ -153,6 +172,12 @@ print("                  ********* EJECUCIÓN NO DETERMINISTA *********         
 print("                                                                                  ")
 print(" Es la ejecución de varios procesos en sus infinitas pocibilidades de combinación ")
 print(" de orden, es decir, que se desconoce el orden de ejecución de dichos procesos.   ")
+print("                                                                                  ")
+print("                           ********* SEMÁFORO *********                           ")
+print("                                                                                  ")
+print(" Es la ejecución de varios procesos en sus infinitas pocibilidades de combinación ")
+print(" de orden, es decir, que se desconoce el orden de ejecución de dichos procesos.   ")
+print("                                                                                  ")
 
 # II) Development
 print("                                                                                  ")
