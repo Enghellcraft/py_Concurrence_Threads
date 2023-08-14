@@ -14,7 +14,7 @@ from collections import Counter
 print_lock = threading.Lock()
 
 # Functions
-def avanzar_caballo(nombre, distancia_recorrida, distancia_total, ganador_event, ganadores_historico):
+def avanzar_caballo(nombre, distancia_recorrida, distancia_total, ganador_event, ganadores_historico, race_progress):
     while (distancia_recorrida < distancia_total):
         if ganador_event.is_set():
             return
@@ -36,11 +36,16 @@ def avanzar_caballo(nombre, distancia_recorrida, distancia_total, ganador_event,
             distancia_recorrida += salto
             if not ganador_event.is_set():
                 print(f"{nombre} ha recorrido {distancia_recorrida} metros.")
+                race_progress.append((nombre, distancia_recorrida))  # Store horse progress
         time.sleep(0.8) # Timer para evitar impresiones fuera de lugar     
 
-def carrera(distancia_total):
+def carrera(distancia_total, race_count):
     
-    print("\n*--------** Comienza la Carrera!! **--------*")
+    print(f"\n*--------** Comienza la Carrera {race_count}!! **--------*")
+    
+    # Variables to store horse progress
+    race_progress = []
+    
     while True:
         caballos = []
         ganador_event = threading.Event()
@@ -48,7 +53,7 @@ def carrera(distancia_total):
 
         for i in range(1, 11):
             distancia_recorrida = 0
-            caballo_thread = threading.Thread(target=avanzar_caballo, args=(f"Caballo {i}", distancia_recorrida, distancia_total, ganador_event, ganadores_historico))
+            caballo_thread = threading.Thread(target=avanzar_caballo, args=(f"Caballo {i}", distancia_recorrida, distancia_total, ganador_event, ganadores_historico, race_progress))
             caballos.append(caballo_thread)
 
         for caballo in caballos:
@@ -59,6 +64,17 @@ def carrera(distancia_total):
             caballo.join(0.1) # Termina el thread donde sea que este
 
         if ganadores_historico:
+            # Plot horse progress
+            fig, ax = plt.subplots(figsize=(6, 6))
+            for horse, progress in race_progress:
+                ax.plot(range(1, progress + 1), [horse] * progress, label=horse)
+            ax.set_xlabel('Distancia Recorrida')
+            ax.set_ylabel('Caballo')
+            ax.set_title(f'Progreso de los Caballos en la Carrera {race_count}')
+            plt.tight_layout()
+
+            plt.show()
+            
             return ganadores_historico[-1]  # Devolver el último ganador
 
 def main():
@@ -67,8 +83,8 @@ def main():
 
     ganadores_historicos = []
 
-    for _ in range(carreras):
-        ganador = carrera(distancia_total)
+    for race_count in range(1, carreras + 1):
+        ganador = carrera(distancia_total, race_count)
         if ganador:
             ganadores_historicos.append(ganador)
     
