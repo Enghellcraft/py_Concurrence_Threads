@@ -18,20 +18,19 @@ def avanzar_caballo(nombre, distancia_recorrida, distancia_total, ganador_event,
     while (distancia_recorrida < distancia_total):
         if ganador_event.is_set():
             return
+        
         salto = random.randint(1, 6)
         #salto = 1
 
-        distancia_recorrida += salto
-
-        print(f"{nombre} ha recorrido {distancia_recorrida} metros.")
-        # Guarda el progreso del caballo
-        race_progress.append((nombre, distancia_recorrida)) 
-
-        if distancia_recorrida >= distancia_total:
-            distancia_recorrida = distancia_total
-
+        if (distancia_recorrida + salto) >= distancia_total:
             # Detener a los otros caballos
             ganador_event.set()
+            
+            distancia_recorrida = distancia_total
+            print(f"{nombre} ha recorrido {distancia_recorrida} metros.")
+            # Guarda el progreso del caballo
+            race_progress.append((nombre, distancia_recorrida))   
+            
             # Uso de lock para impresión única del término de carrera, como SEMAFORO para sección critca
             if print_lock.acquire(blocking=False):  # Devuelve false si ya esta lockeado. // WAIT
                 print("\n*--------** La Carrera Termino **--------*")
@@ -39,10 +38,15 @@ def avanzar_caballo(nombre, distancia_recorrida, distancia_total, ganador_event,
                 print(f"\n{nombre} ganó!\n")
                 # Quita el lock // SIGNAL
                 print_lock.release()
-                ganadores_historico.append(nombre)
+                ganadores_historico.append(nombre)   
                 return 
-            
-        time.sleep(0.8) # Timer para evitar impresiones fuera de lugar     
+        else:
+            distancia_recorrida += salto 
+            print(f"{nombre} ha recorrido {distancia_recorrida} metros.")
+            # Guarda el progreso del caballo
+            race_progress.append((nombre, distancia_recorrida))   
+                    
+        time.sleep(0.9) # Timer para evitar impresiones fuera de lugar     
 
 def carrera(distancia_total, race_count):
     
@@ -212,10 +216,10 @@ print("  Al utilizar un lock de la librería de Thread en la impresión del fin 
 print("  se puede evitar el ingreso de threads a la misma sección, dejando la impresión  ")
 print("  solamente para el thread que finalice primero.                                  ")
 print("                                                                                  ")
-print("  NOTA1: en la línea 22 puede verse el salto de caballo unitario, en caso de querer")
+print("  NOTA1: en la línea 23 puede verse el salto de caballo unitario, en caso de querer")
 print("  probar la primera conclusión. Esta comentado pero funcional, requiere comentar el")
 print("  salto aleatorio para evitar errores.                                            ")
 print("                                                                                  ")
-print("  NOTA2: en la línea 36 y 41 se agrega el lock a la impresión, en caso de removerlas")
+print("  NOTA2: en la línea 35 y 40 se agrega el lock a la impresión, en caso de removerlas")
 print("  y correr el programa, podrá observarse la impresión de más de un thread que finaliza.")
 print("                                                                                  ")
