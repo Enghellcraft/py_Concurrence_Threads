@@ -1,6 +1,10 @@
 #
 # TRABAJO PRACTICO DE SEMINARIO
 #
+#ALUMNOS:                                                                      
+#       • Bardales, Wilfredo                                                  
+#       • Martin, Denise                                                     
+#       • Paleari, Carolina                                                  
 
 # imports
 import random
@@ -128,7 +132,7 @@ print("*************************************************************************
 print("    ALUMNOS:                                                                      ")
 print("            • Bardales, Wilfredo                                                  ")
 print("            • Martin, Denise                                                      ")
-print("            • Paleari, Carolina                                                    ")
+print("            • Paleari, Carolina                                                   ")
 print("                                                                                  ")
 print("**********************************************************************************")
 print("*                                   OBJETIVO                                     *")
@@ -151,11 +155,11 @@ print("  ciclo las posiciones de los caballos, o bien de alguna manera el camino
 print("  recorriendo cada uno (usando símbolos Ascii). El programa podría producir un    ")
 print("  ganador disitnto cada vez que se corra. Opcionalmente, extender el funcionamiento")
 print("  a un array de n caballos, donde n puede ser un parámetro.                       ")
-print("  Puntos a Cumplir:                       ")
-print("  1- Definir  10 caballos para correr una carrera, cada caballo es un thread.     ")
+print("  Puntos a Cumplir:                                                               ")
+print("  1- Definir 10 caballos para correr una carrera, cada caballo es un thread.     ")
 print("  2- Definir una distancia de 20.                                                 ")
 print("  3- Todos los caballos corren moviendose en saltos 1 a 1, o aleatorios.          ")
-print("  4- Sólo un caballo puede ganar, y cuando lo hace deben frenarse todos los demás.")
+print("  4- Solo un caballo puede ganar, y cuando lo hace deben frenarse todos los demás.")
 print("  5- Implementar un semáforo con lock de Thread para limitar la sección crìtica.  ")
 print("                                                                                  ")
 
@@ -180,11 +184,21 @@ print("                                                                         
 print(" Es la ejecución de varios procesos en sus infinitas posibilidades de combinación ")
 print(" de orden, es decir, que se desconoce el orden de ejecución de dichos procesos.   ")
 print("                                                                                  ")
+print("                      ********* SECCIÓN CRÍTICA *********                         ")
+print("                                                                                  ")
+print(" Porción de código que debe ser ejecutada única y atómicamente.                   ")
+print("                                                                                   ")
 print("                           ********* SEMÁFORO *********                           ")
 print("                                                                                  ")
 print(" Variable o tipo de dato abstracto utilizado para el acceso a un recurso común    ")
 print(" requerido por múltiples threads, o para evitar problema de acceso a sección      ")
-print(" crítica en sistemas concurrentes.")
+print(" crítica en sistemas concurrentes.                                                ")
+print("                                                                                  ")
+print("                      ********* EXCLUSIÓN MUTUA *********                         ")
+print("                                                                                  ")
+print(" Evitar que varios hilos accedan simultáneamente a sección crítica, esencialmente")
+print(" para evitar condiciones de carrera y garantizar la integridad de los datos       ")
+print(" compartidos.                                                                     ")
 print("                                                                                  ")
 
 # II) Development
@@ -209,12 +223,20 @@ print("  disminuir esta leve probabilidad.                                      
 print("                                                                                  ")
 print("  El uso de threads aquí, muestra que la falta de prioridad en una concurrencia,  ")
 print("  resulta en un sistema indeterminado de posibles salidas del proceso, donde,     ")
-print("  siendo n la cantidad de threads, cada thread tiene una probabilidad de 1/n * 100%")
+print("  siendo n la cantidad de threads, cada thread tiene una probabilidad de 1/n      ")
 print("  de salir ganador (considerando casos ideales).                                  ")
 print("                                                                                  ")
 print("  Al utilizar un lock de la librería de Thread en la impresión del fin de carrera ")
 print("  se puede evitar el ingreso de threads a la misma sección, dejando la impresión  ")
-print("  solamente para el thread que finalice primero.                                  ")
+print("  solamente para el thread que finalice primero. Permite volver atómica esa función")
+print("  para evitar ser interrumpida por otro proceso.                                  ")
+print("                                                                                  ")
+print("  Para asegurar el término de los procesos post selección de ganador, se utilizó  ")
+print("  el Event() de la librería threading, como flag boolean; el cual posee la directiva")
+print("  is_set() para corroborar si está en True, y set() para colocarlo en True.       ")
+print("                                                                                  ")
+print("  La concurrencia de los procesos se asegura mediante el start() en cada uno, y su")
+print("  finalización con el main, mediante join().                                      ")
 print("                                                                                  ")
 print("  NOTA1: en la línea 23 puede verse el salto de caballo unitario, en caso de querer")
 print("  probar la primera conclusión. Esta comentado pero funcional, requiere comentar el")
@@ -223,3 +245,15 @@ print("                                                                         
 print("  NOTA2: en la línea 35 y 40 se agrega el lock a la impresión, en caso de removerlas")
 print("  y correr el programa, podrá observarse la impresión de más de un thread que finaliza.")
 print("                                                                                  ")
+print("                                /\/\                                              ")
+print("                              ))  (O\                                             ")
+print("           _....  _     _    (((     \                                            ")
+print("        (((     '-\\____)|_.-((( (_   \                                           ")
+print("       )))         \    /        / \o(/                                           ")
+print("       (((\     /   \  / (      /                                                 ")
+print("       ))) |   /_         \   //                                                  ")
+print("       ((( /  /  '-..___.-'| |                                                    ")
+print("           \ (             \ )                                                    ")
+print("            \ \            / |                                                    ")
+print("             \_\           |_|                                                    ")
+print("             /_\           /_\                                                    ")
