@@ -20,8 +20,16 @@ def avanzar_caballo(nombre, distancia_recorrida, distancia_total, ganador_event,
             return
         salto = random.randint(1, 6)
         #salto = 1
-        if (distancia_recorrida + salto) >= distancia_total:
+
+        distancia_recorrida += salto
+
+        print(f"{nombre} ha recorrido {distancia_recorrida} metros.")
+        # Guarda el progreso del caballo
+        race_progress.append((nombre, distancia_recorrida)) 
+
+        if distancia_recorrida >= distancia_total:
             distancia_recorrida = distancia_total
+
             # Detener a los otros caballos
             ganador_event.set()
             # Uso de lock para impresión única del término de carrera, como SEMAFORO para sección critca
@@ -31,14 +39,9 @@ def avanzar_caballo(nombre, distancia_recorrida, distancia_total, ganador_event,
                 print(f"\n{nombre} ganó!\n")
                 # Quita el lock // SIGNAL
                 print_lock.release()
-                ganadores_historico.append(nombre)   
+                ganadores_historico.append(nombre)
                 return 
-        else :
-            distancia_recorrida += salto
-            if not ganador_event.is_set():
-                print(f"{nombre} ha recorrido {distancia_recorrida} metros.")
-                # Guarda el progreso del caballo
-                race_progress.append((nombre, distancia_recorrida)) 
+            
         time.sleep(0.8) # Timer para evitar impresiones fuera de lugar     
 
 def carrera(distancia_total, race_count):
@@ -148,7 +151,7 @@ print("  Puntos a Cumplir:                       ")
 print("  1- Definir  10 caballos para correr una carrera, cada caballo es un thread.     ")
 print("  2- Definir una distancia de 20.                                                 ")
 print("  3- Todos los caballos corren moviendose en saltos 1 a 1, o aleatorios.          ")
-print("  4- Sólo un caballo puede ganar, y cuando lo ahce deben frenarse todos los demás.")
+print("  4- Sólo un caballo puede ganar, y cuando lo hace deben frenarse todos los demás.")
 print("  5- Implementar un semáforo con lock de Thread para limitar la sección crìtica.  ")
 print("                                                                                  ")
 
@@ -170,7 +173,7 @@ print(" información para ser ejecutado, es decir, tiempo del procesador asignad
 print("                                                                                  ")
 print("                  ********* EJECUCIÓN NO DETERMINISTA *********                   ")
 print("                                                                                  ")
-print(" Es la ejecución de varios procesos en sus infinitas pocibilidades de combinación ")
+print(" Es la ejecución de varios procesos en sus infinitas posibilidades de combinación ")
 print(" de orden, es decir, que se desconoce el orden de ejecución de dichos procesos.   ")
 print("                                                                                  ")
 print("                           ********* SEMÁFORO *********                           ")
@@ -210,9 +213,9 @@ print("  se puede evitar el ingreso de threads a la misma sección, dejando la i
 print("  solamente para el thread que finalice primero.                                  ")
 print("                                                                                  ")
 print("  NOTA1: en la línea 22 puede verse el salto de caballo unitario, en caso de querer")
-print("  pobar la primera conclusión. Esta comentado pero funcional, requiere comentar el")
+print("  probar la primera conclusión. Esta comentado pero funcional, requiere comentar el")
 print("  salto aleatorio para evitar errores.                                            ")
 print("                                                                                  ")
-print("  NOTA2: en la línea 28 y 33 se agrega el lock a la impresión, en cao de removerlas")
-print("  y correr el programa, podrá observarse la impresión de mas de un thread que finaliza.")
+print("  NOTA2: en la línea 36 y 41 se agrega el lock a la impresión, en caso de removerlas")
+print("  y correr el programa, podrá observarse la impresión de más de un thread que finaliza.")
 print("                                                                                  ")
