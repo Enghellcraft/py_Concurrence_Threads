@@ -107,7 +107,7 @@ print("  CARRERA DE CABALLOS:                                                   
 print("  1- Definir  10 caballos para correr una carrera, cada caballo es un thread.     ")
 print("  2- Definir una distancia de 20.                                                 ")
 print("  3- Todos los caballos corren moviendose en saltos 1 a 1, o aleatorios.          ")
-print("  4- Sólo un caballo puede ganar, y cuando lo ahce deben frenarse todos los demás.")
+print("  4- Sólo un caballo puede ganar, y cuando lo hace deben frenarse todos los demás.")
 print("                                                                                  ")
 
 #  I) Theory
@@ -128,7 +128,7 @@ print(" información para ser ejecutado, es decir, tiempo del procesador asignad
 print("                                                                                  ")
 print("                  ********* EJECUCIÓN NO DETERMINISTA *********                   ")
 print("                                                                                  ")
-print(" Es la ejecución de varios procesos en sus infinitas pocibilidades de combinación ")
+print(" Es la ejecución de varios procesos en sus infinitas posibilidades de combinación ")
 print(" de orden, es decir, que se desconoce el orden de ejecución de dichos procesos.   ")
 
 # II) Development
