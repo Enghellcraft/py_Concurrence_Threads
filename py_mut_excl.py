@@ -46,6 +46,68 @@ def exclusion_mutua_n_threads():
         t = threading.Thread(target=encolado_de_thread)
         t.start()
         t.join()
+        
+# EX 2
+def lamport_bakery_2_threads():
+    np = 0  # Contador del proceso P
+    nq = 0  # Contador del proceso Q
+
+    def process_p():
+        global np
+        while True:
+
+            # Non-critical section
+                
+            # Incrementa np y espera que nq sea cero o np <= nq
+            lock.acquire()
+            np = nq + 1
+            while nq != 0 and np > nq:
+                lock.release()
+                lock.acquire()
+            lock.release()
+
+            print("Valor de np:", np)
+            # Critical section
+            lock.acquire()
+            print("Proceso P esta en su sección crítica")
+            lock.release()
+
+            # Resetea np
+
+                
+            time.sleep(2)
+
+    def process_q():
+        global nq
+        while True:
+            # Non-critical section
+
+            # Incrementa nq y espera que np sea cero o nq < np
+            lock.acquire()
+            nq = np + 1
+            while np != 0 and nq < np:
+                lock.release()
+                lock.acquire()
+            lock.release()
+
+            print("Valor de nq:", nq)
+            # Critical section
+            lock.acquire()
+            print("Proceso Q esta en su sección crítica")
+            lock.release()
+
+            # Resetea nq
+
+            
+            time.sleep(0.5)
+            
+    # Create and start the two processes
+    p = threading.Thread(target=process_p)
+    q = threading.Thread(target=process_q)
+    p.start()
+    q.start()
+    p.join()
+    q.join()
 
 
 #  null) Task + Pres
@@ -120,19 +182,19 @@ print("                                                                         
 # II) Development
 print("                                                                                  ")
 print("**********************************************************************************")
-print("*                        SOLUCION A EXCLUSION MUTUA                              *")
+print("*                          SOLUCION A EXCLUSION MUTUA                            *")
 print("**********************************************************************************")
 print("                                                                                  ")
 exclusion_mutua_n_threads()
 print("                                                                                  ")
 print("**********************************************************************************")
-print("*                        BAKERY ALGORITHM: 2 PROCESOS                            *")
+print("*                          LAMPORT BAKERY: 2 PROCESOS                            *")
 print("**********************************************************************************")
 print("                                                                                  ")
-
+lamport_bakery_2_threads()
 print("                                                                                  ")
 print("**********************************************************************************")
-print("*                        BAKERY ALGORITHM: N PROCESOS                            *")
+print("*                          LAMPORT BAKERY: N PROCESOS                            *")
 print("**********************************************************************************")
 print("                                                                                  ")
    
