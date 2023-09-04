@@ -7,14 +7,45 @@
 #       • Paleari, Carolina                                                  
 
 # imports
-import random
 import threading
 import time
+from queue import Queue
 
 # Global Variables
-
+# Lock asegura la exclusion mutua similar al caso de semáforo
+lock = threading.Lock()
 
 # Functions
+# EX 1
+def exclusion_mutua_n_threads():
+    # Cola de espera para los turnos de cada thread
+    turn_queue = Queue()
+
+    def imprime_thread_ejecutandose():
+        print("%s Funcionando en su turno" % str(threading.current_thread()))
+        time.sleep(0.1)
+
+    def encolado_de_thread():
+        # Entrega un turno por cola al turno en ejecución
+        turn_queue.put(threading.current_thread())
+
+        # Espera hasta su turno
+        while turn_queue.queue[0] is not threading.current_thread():
+            pass
+
+        # Con lock permite que sólo un thread acceda a la seccion crítica
+        with lock:
+            imprime_thread_ejecutandose()
+
+        # Elimina al thread de la cola
+        turn_queue.get()
+
+    # Create and start an infinite number of threads
+    # while True:
+    for i in range(10):
+        t = threading.Thread(target=encolado_de_thread)
+        t.start()
+        t.join()
 
 
 #  null) Task + Pres
@@ -92,7 +123,7 @@ print("*************************************************************************
 print("*                        SOLUCION A EXCLUSION MUTUA                              *")
 print("**********************************************************************************")
 print("                                                                                  ")
-
+exclusion_mutua_n_threads()
 print("                                                                                  ")
 print("**********************************************************************************")
 print("*                        BAKERY ALGORITHM: 2 PROCESOS                            *")
@@ -112,4 +143,8 @@ print("*************************************************************************
 print("*                                CONCLUSIONES                                    *")
 print("**********************************************************************************")
 print("  BLAH")
+print("                                                                                  ")
+print("  NOTA1: en la línea 44 puede descomentarse el 'while true' y permitir infitos    ")
+print("         threads ejecutarse y encolarse. Para evitar dejar ad infinitum el mismo  ")
+print("         se le dio un rango de 10 threads.                                        ")
 
