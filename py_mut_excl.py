@@ -10,6 +10,7 @@
 import threading
 import time
 from queue import Queue
+from multiprocessing import Process, Value, Lock
 
 # Global Variables
 # Lock asegura la exclusion mutua similar al caso de semáforo
@@ -71,10 +72,7 @@ def lamport_bakery_2_threads():
             lock.acquire()
             print("Proceso P esta en su sección crítica")
             lock.release()
-
-            # Resetea np
-
-                
+           
             time.sleep(2)
 
     def process_q():
@@ -95,13 +93,9 @@ def lamport_bakery_2_threads():
             lock.acquire()
             print("Proceso Q esta en su sección crítica")
             lock.release()
-
-            # Resetea nq
-
             
             time.sleep(0.5)
             
-    # Create and start the two processes
     p = threading.Thread(target=process_p)
     q = threading.Thread(target=process_q)
     p.start()
@@ -109,7 +103,48 @@ def lamport_bakery_2_threads():
     p.join()
     q.join()
 
+def lamport_bakery_n_threads():
+    num_processes = 10
 
+    def bakery_algorithm(process_id, num_processes):
+        # indica el numero de cola del proceso, devolviendo un booleano
+        choosing = [False] * num_processes
+        # guarda el numero de ticket del thread
+        number = [0] * num_processes
+        lock = Lock()
+
+        def lock_process():
+            choosing[process_id] = True # elige el proceso en true
+            # asigna un numero  de cola y lo incrementa uno para asegurar que su numero es unico y no hay numeros mas grandes de cola
+            number[process_id] = max(number) + 1 
+            choosing[process_id] = False # vuelve a false el procesi cuando ya tiene un numero de cola
+
+            for j in range(num_processes):
+                while choosing[j]:# loop que espera hasta que el proceso j tome su numero
+                    pass
+                # loop que espera que el turno del proceso actual para entrar a seccion critica
+                # compara los numeros e ids de los procesos para saber el orden de entrada a seccion critica
+                while number[j] != 0 and (number[j], j) < (number[process_id], process_id):
+                    pass
+
+        def unlock_process():
+            number[process_id] = 0
+
+        # Non-critical section
+
+        lock_process()
+
+        # Critical section
+        print("Proceso", process_id, "está en la sección crítica")
+
+        unlock_process()
+
+        # Non-critical section
+        time.sleep(1)
+
+    for i in range(num_processes):
+        bakery_algorithm(i+1, num_processes)
+    
 #  null) Task + Pres
 print("                                                                                  ")
 print("**********************************************************************************")
@@ -191,13 +226,13 @@ print("*************************************************************************
 print("*                          LAMPORT BAKERY: 2 PROCESOS                            *")
 print("**********************************************************************************")
 print("                                                                                  ")
-lamport_bakery_2_threads()
+#lamport_bakery_2_threads()
 print("                                                                                  ")
 print("**********************************************************************************")
 print("*                          LAMPORT BAKERY: N PROCESOS                            *")
 print("**********************************************************************************")
 print("                                                                                  ")
-   
+lamport_bakery_n_threads()  
 
     
 # III)  Conclusions
@@ -209,4 +244,21 @@ print("                                                                         
 print("  NOTA1: en la línea 44 puede descomentarse el 'while true' y permitir infitos    ")
 print("         threads ejecutarse y encolarse. Para evitar dejar ad infinitum el mismo  ")
 print("         se le dio un rango de 10 threads.                                        ")
+print("                                                                                  ")
+print("  NOTA1: en la línea 102 puede modificarse la cantidad de threads y permitir infitos")
+print("         threads ejecutarse y encolarse. Para evitar dejar ad infinitum el mismo  ")
+print("         se le dio un rango de 10 threads.                                        ")
+print("                                                                                  ")
+print("               ____                                                               ")
+print("              /    \	                                                             ")
+print("             |  u  u|                                                             ")
+print("             |    \ |  .-''#%&#&%#``-.                                            ")
+print("              \  = /  ((%&#&#&%&VK&%&))                                           ")
+print("               |  |    `-._#%&##&%_.-'                                            ")
+print("               /\/\`--.   `-."".-'                                                ")
+print("               |  |    \   /`./                                                   ")
+print("               |\/|  \  `-'  /                                                    ")
+print("               || |   \     /                                                     ")
+
+
 
