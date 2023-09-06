@@ -6,6 +6,10 @@
 #       • Martin, Denise                                                     
 #       • Paleari, Carolina                                                  
 
+# Ver si se puede hacer en el 1 con min o max (?) en vez de cola y cual es el mas eficiente de los 2 metodos
+# Hacer el 2 teorico para poder mostrar cuan ineficiente seria el caso de tickets en aumento creciente para por ejemplo 2 procesos
+
+
 # imports
 import threading
 import time
@@ -17,7 +21,7 @@ from multiprocessing import Process, Value, Lock
 lock = threading.Lock()
 
 # Functions
-# EX 1
+# EX 1   ---> con cola se parece mas a Bakery que a Dekker
 def exclusion_mutua_n_threads():
     # Cola de espera para los turnos de cada thread
     turn_queue = Queue()
@@ -47,6 +51,52 @@ def exclusion_mutua_n_threads():
         t = threading.Thread(target=encolado_de_thread)
         t.start()
         t.join()
+    
+# ---> armo otro codigo para demostrar Dekker en las conclusiones
+def mutual_exclusion_n_threads():
+    n = 10  # cant threads
+
+    want = [False] * n  # Array de procesos q quieren entrar a seccion critica
+    turn = [0] * n  # Array que indica el turno de cada thread
+    
+    def imprime_thread_ejecutandose(pid): # id del proceso
+        print(f"Funcionando en su turno el Thread {pid+1}")
+        time.sleep(0.1)    
+
+    def encolado_de_thread(pid):
+        nonlocal want, turn
+
+        # Flag indicador de querer ingreso a seccion critica
+        want[pid] = True
+
+        # Encuentra el máximo entre threads
+        max_turn = max(turn)
+
+        # Establece el turno para el thread actual
+        turn[pid] = 1 + max_turn
+
+        # Espera el turno del thread
+        for i in range(n):
+            if i != pid:
+                # Espera mientras otros threads quieren ingresar a seccion critica y es su turno
+                while want[i] and (turn[i] < turn[pid] or (turn[i] == turn[pid] and i < pid)):
+                    pass
+
+        # Critical section
+        imprime_thread_ejecutandose(pid)
+            
+        # Salida
+        want[pid] = False
+    
+    threads = []
+    for i in range(n):
+        t = threading.Thread(target=encolado_de_thread, args=(i,), name=f"Thread-{i+1}")
+        threads.append(t)
+        t.start()
+
+    for t in threads:
+        t.join()   
+    
         
 # EX 2
 def lamport_bakery_2_threads():
@@ -285,6 +335,7 @@ print("*                          SOLUCION A EXCLUSION MUTUA                    
 print("**********************************************************************************")
 print("                                                                                  ")
 exclusion_mutua_n_threads()
+mutual_exclusion_n_threads()
 print("                                                                                  ")
 print("**********************************************************************************")
 print("*                          LAMPORT BAKERY: 2 PROCESOS                            *")
