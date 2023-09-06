@@ -21,46 +21,15 @@ from multiprocessing import Process, Value, Lock
 lock = threading.Lock()
 
 # Functions
-# EX 1   ---> con cola se parece mas a Bakery que a Dekker
-def exclusion_mutua_n_threads():
-    # Cola de espera para los turnos de cada thread
-    turn_queue = Queue()
-
-    def imprime_thread_ejecutandose():
-        print("%s Funcionando en su turno" % str(threading.current_thread()))
-        time.sleep(0.1)
-
-    def encolado_de_thread():
-        # Entrega un turno por cola al turno en ejecución
-        turn_queue.put(threading.current_thread())
-
-        # Espera hasta su turno
-        while turn_queue.queue[0] is not threading.current_thread():
-            pass
-
-        # Con lock permite que sólo un thread acceda a la seccion crítica
-        with lock:
-            imprime_thread_ejecutandose()
-
-        # Elimina al thread de la cola
-        turn_queue.get()
-
-    # Create and start an infinite number of threads
-    # while True:
-    for i in range(10):
-        t = threading.Thread(target=encolado_de_thread)
-        t.start()
-        t.join()
-    
-# ---> armo otro codigo para demostrar Dekker en las conclusiones
+# EX 1  
 def mutual_exclusion_n_threads():
-    n = 10  # cant threads
+    num_processes = 10  # cant threads
 
-    want = [False] * n  # Array de procesos q quieren entrar a seccion critica
-    turn = [0] * n  # Array que indica el turno de cada thread
+    want = [False] * num_processes  # Array de procesos q quieren entrar a seccion critica
+    turn = [0] * num_processes  # Array que indica el turno de cada thread
     
-    def imprime_thread_ejecutandose(pid): # id del proceso
-        print(f"Funcionando en su turno el Thread {pid+1}")
+    def imprime_thread_ejecutandose(pid, turn): # id del proceso
+        print("Proceso", pid + 1, "está en la sección crítica, en su turno", turn)
         time.sleep(0.1)    
 
     def encolado_de_thread(pid):
@@ -76,20 +45,20 @@ def mutual_exclusion_n_threads():
         turn[pid] = 1 + max_turn
 
         # Espera el turno del thread
-        for i in range(n):
+        for i in range(num_processes):
             if i != pid:
                 # Espera mientras otros threads quieren ingresar a seccion critica y es su turno
                 while want[i] and (turn[i] < turn[pid] or (turn[i] == turn[pid] and i < pid)):
                     pass
 
         # Critical section
-        imprime_thread_ejecutandose(pid)
+        imprime_thread_ejecutandose(pid,turn[pid])
             
         # Salida
         want[pid] = False
     
     threads = []
-    for i in range(n):
+    for i in range(num_processes):
         t = threading.Thread(target=encolado_de_thread, args=(i,), name=f"Thread-{i+1}")
         threads.append(t)
         t.start()
@@ -373,6 +342,25 @@ print("       de CPU y no es adecuado para sistemas con recursos limitados o req
 print("       de tiempo real.                                                            ")
 print("     • Solo admite la exclusión mutua entre dos procesos. Ampliarlo a más de dos  ")
 print("       procesos requiere modificaciones y complejidad adicionales.                ")
+print("                                                                                  ")
+print(" En el Ejercicio 1, se realiza un enfoque simple por turnos para lograr la        ")
+print(" la exclusión mutua, basado en el planteo del Algoritmo de Dekker. Garantiza que  ")
+print(" solo un hilo ingrese a la sección crítica a la vez y otros esperen su turno.     ")
+print(" PROS:                                                                            ")
+print("     • El código garantiza la exclusión mutua, lo que impide el acceso simultáneo ")
+print("       a la sección crítica y evita condiciones de carrera.                       ")
+print("     • Es fácil de entender e implementar, utilizando técnicas básicas de         ")
+print("       sincronización.                                                            ")
+print("     • El código utiliza un enfoque por turnos, que garantiza la equidad. Cada hilo")
+print("       tiene la oportunidad de ingresar a la sección crítica en forma de turnos.  ")
+print(" CONS:                                                                            ")
+print("     • El código implica una espera ocupada, lo que es ineficiente en términos    ")
+print("       de utilización de recursos.                                                ")
+print("     •  El enfoque basado en turnos puede generar contención y reducción del      ")
+print("       rendimiento, especialmente con una gran cantidad de subprocesos.           ")
+print("     • El código no maneja casos excepcionales como fallas de subprocesos o       ")
+print("       interrupciones del sistema. Tampoco proporciona ningún mecanismo para la   ")
+print("       programación basada en prioridades.                                        ")
 print("                                                                                  ")
 print(" El Algoritmo Bakery diferentes variaciones e implementaciones con sus propias    ")
 print("   compensaciones y optimizaciones.                                               ")
