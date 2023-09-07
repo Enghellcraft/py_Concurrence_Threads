@@ -13,6 +13,7 @@
 # imports
 import threading
 import time
+import random
 
 # Global Variables
 # Lock asegura la exclusion mutua similar al caso de semáforo
@@ -151,6 +152,8 @@ def lamport_bakery_n_threads(num_processes):
     for i in range(num_processes):
         t = threading.Thread(target=bakery_algorithm, args=(i,), name=f"Thread-{i+1}")
         threads.append(t)
+
+    random.shuffle(threads)
 
     for t in threads:
         t.start()   
