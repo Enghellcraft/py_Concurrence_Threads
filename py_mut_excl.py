@@ -13,15 +13,13 @@
 # imports
 import threading
 import time
-from queue import Queue
-from multiprocessing import Process, Value, Lock
 
 # Global Variables
 # Lock asegura la exclusion mutua similar al caso de semáforo
 lock = threading.Lock()
 
 # Functions
-# EX 1  
+# EX N THREADS EXCLUSIÓN MUTUA
 def mutual_exclusion_n_threads():
     num_processes = 10  # cant threads
 
@@ -67,7 +65,7 @@ def mutual_exclusion_n_threads():
         t.join()   
     
         
-# EX 2
+# EX 2 THREADS BAKERY
 def lamport_bakery_2_threads():
     np = 0  # Contador del proceso P
     nq = 0  # Contador del proceso Q
@@ -122,48 +120,45 @@ def lamport_bakery_2_threads():
     p.join()
     q.join()
 
-def lamport_bakery_n_threads():
-    num_processes = 10
+# EX 3/N THREADS BAKERY
+def lamport_bakery_n_threads(num_processes):
+    # indica el numero de cola del proceso, devolviendo un booleano
+    choosing = [False] * num_processes
+    # guarda el numero de ticket del thread
+    tickets = [0] * num_processes
 
-    def bakery_algorithm(process_id, num_processes):
-        # indica el numero de cola del proceso, devolviendo un booleano
-        choosing = [False] * num_processes
-        # guarda el numero de ticket del thread
-        number = [0] * num_processes
-        lock = Lock()
+    def bakery_algorithm(process_id):
+        choosing[process_id] = True # elige el proceso en true
+        # asigna un numero  de cola y lo incrementa uno para asegurar que su numero es unico y no hay numeros mas grandes de cola
+        tickets[process_id] = max(tickets) + 1 
+        choosing[process_id] = False # vuelve a false el procesi cuando ya tiene un numero de cola
 
-        def lock_process():
-            choosing[process_id] = True # elige el proceso en true
-            # asigna un numero  de cola y lo incrementa uno para asegurar que su numero es unico y no hay numeros mas grandes de cola
-            number[process_id] = max(number) + 1 
-            choosing[process_id] = False # vuelve a false el procesi cuando ya tiene un numero de cola
-
-            for j in range(num_processes):
-                while choosing[j]:# loop que espera hasta que el proceso j tome su numero
-                    pass
-                # loop que espera que el turno del proceso actual para entrar a seccion critica
-                # compara los numeros e ids de los procesos para saber el orden de entrada a seccion critica
-                while number[j] != 0 and (number[j], j) < (number[process_id], process_id):
-                    pass
-
-        def unlock_process():
-            number[process_id] = 0
-
-        # Non-critical section
-
-        lock_process()
+        for j in range(num_processes):
+            while choosing[j]:# loop que espera hasta que el proceso j tome su numero
+                pass
+            # loop que espera que el turno del proceso actual para entrar a seccion critica
+            # compara los numeros e ids de los procesos para saber el orden de entrada a seccion critica
+            while tickets[j] != 0 and (tickets[j] < tickets[process_id] or (tickets[j] == tickets[process_id] and j < process_id)):
+                pass
 
         # Critical section
         print("Proceso", process_id + 1, "está en la sección crítica")
+        time.sleep(0.1)
 
-        unlock_process()
+        tickets[process_id] = False
 
-        # Non-critical section
-        time.sleep(0.5)
-
+    threads = []
     for i in range(num_processes):
-        bakery_algorithm(i, num_processes)
-    
+        t = threading.Thread(target=bakery_algorithm, args=(i,))
+        threads.append(t)
+
+    for t in threads:
+        t.start()   
+
+    for t in threads:
+        t.join()   
+
+        
 #  null) Task + Pres
 print("                                                                                  ")
 print("**********************************************************************************")
@@ -303,19 +298,21 @@ print("*************************************************************************
 print("*                          SOLUCION A EXCLUSION MUTUA                            *")
 print("**********************************************************************************")
 print("                                                                                  ")
-mutual_exclusion_n_threads()
+# mutual_exclusion_n_threads()
 print("                                                                                  ")
 print("**********************************************************************************")
 print("*                          LAMPORT BAKERY: 2 PROCESOS                            *")
 print("**********************************************************************************")
 print("                                                                                  ")
-#lamport_bakery_2_threads()
+# lamport_bakery_2_threads()
 print("                                                                                  ")
 print("**********************************************************************************")
 print("*                          LAMPORT BAKERY: N PROCESOS                            *")
 print("**********************************************************************************")
 print("                                                                                  ")
-lamport_bakery_n_threads()  
+
+N = int(input("Cantidad de threads: "))
+lamport_bakery_n_threads(N)  
 
     
 # III)  Conclusions
