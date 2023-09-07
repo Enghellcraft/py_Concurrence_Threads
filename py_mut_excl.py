@@ -142,14 +142,14 @@ def lamport_bakery_n_threads(num_processes):
                 pass
 
         # Critical section
-        print("Proceso", process_id + 1, "está en la sección crítica")
+        print(threading.current_thread().name, "está en la sección crítica")
         time.sleep(0.1)
 
         tickets[process_id] = False
 
     threads = []
     for i in range(num_processes):
-        t = threading.Thread(target=bakery_algorithm, args=(i,))
+        t = threading.Thread(target=bakery_algorithm, args=(i,), name=f"Thread-{i+1}")
         threads.append(t)
 
     for t in threads:
