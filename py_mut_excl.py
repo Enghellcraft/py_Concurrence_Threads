@@ -79,20 +79,25 @@ def lamport_bakery_2_threads(tiempo_segundos):
     def process_p():
         nonlocal np
         start_time = time.time()
-        while (time.time() - start_time) < tiempo_segundos:
+        while True:
             # Non-critical section
                 
             # Incrementa np y espera que nq sea cero o np <= nq
             lock.acquire()
             np = nq + 1
-            while nq != 0 and np > nq:
+            while nq != 0 and np > nq and (time.time() - start_time) < tiempo_segundos:
                 lock.release()
                 lock.acquire()
+
+            if ((time.time() - start_time) >= tiempo_segundos):
+                lock.release()
+                break
+
             lock.release()
 
             # Critical section
             lock.acquire()
-            print("PROCESO P: -- Valor de np:", np , "y valor nq:", nq)
+            print("PROCESO P: -- Valor de np:", np , "y valor de nq:", nq)
             print("Proceso P esta en su sección crítica")
             lock.release()
            
@@ -101,27 +106,31 @@ def lamport_bakery_2_threads(tiempo_segundos):
     def process_q():
         nonlocal nq
         start_time = time.time()
-        while (time.time() - start_time) < tiempo_segundos:
+        while True:
             # Non-critical section
 
             # Incrementa nq y espera que np sea cero o nq < np
             lock.acquire()
             nq = np + 1
-            while np != 0 and nq >= np:
+            while np != 0 and nq >= np and (time.time() - start_time) < tiempo_segundos:
                 lock.release()
                 lock.acquire()
+
+            if ((time.time() - start_time) >= tiempo_segundos):
+                lock.release()
+                break
+
             lock.release()
 
             # Critical section
             lock.acquire()
-            print("PROCESO Q  -- Valor de nq:", nq, "y valor de np:", np)
+            print("PROCESO Q  -- Valor de np:", np, "y valor de nq:", nq)
             print("Proceso Q esta en su sección crítica")
             lock.release()
             
             time.sleep(0.8)
             
     p = threading.Thread(target=process_p)
-    
     q = threading.Thread(target=process_q)
     p.start()
     q.start()
