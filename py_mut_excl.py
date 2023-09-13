@@ -72,10 +72,14 @@ def mutual_exclusion_n_threads(num_processes):
 
         
 # EX 2 THREADS BAKERY
-def lamport_bakery_2_threads():
+def lamport_bakery_2_threads(tiempo_segundos):
+    np = 0  # Contador del proceso P
+    nq = 0  # Contador del proceso Q
+
     def process_p():
-        global np
-        while True:
+        nonlocal np
+        start_time = time.time()
+        while (time.time() - start_time) < tiempo_segundos:
             # Non-critical section
                 
             # Incrementa np y espera que nq sea cero o np <= nq
@@ -92,11 +96,12 @@ def lamport_bakery_2_threads():
             print("Proceso P esta en su sección crítica")
             lock.release()
            
-            time.sleep(0.3)
+            time.sleep(2)
 
     def process_q():
-        global nq
-        while True:
+        nonlocal nq
+        start_time = time.time()
+        while (time.time() - start_time) < tiempo_segundos:
             # Non-critical section
 
             # Incrementa nq y espera que np sea cero o nq < np
@@ -113,7 +118,7 @@ def lamport_bakery_2_threads():
             print("Proceso Q esta en su sección crítica")
             lock.release()
             
-            time.sleep(0.1)
+            time.sleep(0.5)
             
     p = threading.Thread(target=process_p)
     q = threading.Thread(target=process_q)
@@ -121,7 +126,6 @@ def lamport_bakery_2_threads():
     q.start()
     p.join()
     q.join()
-
 
 # EX 3/N THREADS BAKERY
 def lamport_bakery_n_threads(num_processes):
@@ -284,6 +288,7 @@ print("     requeridas.                                                         
 print(" V) Una vez que el proceso termina de ejecutar la sección crítica, establece su   ")
 print("    número en 0, lo que indica que ya no necesita acceso a la sección crítica     ")
 print("                                                                                  ")
+
 N = int(input("Ingrese la Cantidad de Threads: "))
 
 # II) Development
@@ -298,9 +303,8 @@ print("*************************************************************************
 print("*                          LAMPORT BAKERY: 2 PROCESOS                            *")
 print("**********************************************************************************")
 print("                                                                                  ")
-np = 0  # Contador del proceso P
-nq = 0  # Contador del proceso Q
-lamport_bakery_2_threads()
+TIEMPO = int(input("Ingrese la Cantidad de SEGUNDOS para el ejercicio 2: "))
+lamport_bakery_2_threads(TIEMPO)
 print("                                                                                  ")
 print("**********************************************************************************")
 print("*                          LAMPORT BAKERY: N PROCESOS                            *")
@@ -310,6 +314,7 @@ lamport_bakery_n_threads(N)
 
     
 # III)  Conclusions
+print("                                                                                  ")
 print("**********************************************************************************")
 print("*                                CONCLUSIONES                                    *")
 print("**********************************************************************************")
@@ -356,9 +361,9 @@ print("       rendimiento, especialmente con una gran cantidad de subprocesos.  
 print("     • El código no maneja casos excepcionales como fallas de subprocesos o       ")
 print("       interrupciones del sistema. Tampoco proporciona ningún mecanismo para la   ")
 print("       programación basada en prioridades.                                        ")
-print(" El código esta llevado para n procesos pero no significa en este caso que sea    ")
-print(" producir un cuello de botella a mayor cantidad de threads en ejecución. Podría   ")
-print(" mejorarse entonces con locks, semáforos o exchange.                              ")
+print(" El código esta llevado para n procesos pero no significa en este caso que sea eficiente")
+print(" porque puede producir un cuello de botella a mayor cantidad de threads en ejecución.")
+print(" Podría mejorarse entonces con locks, semáforos o exchange.                       ")
 print("                                                                                  ")
 print(" El Algoritmo Bakery diferentes variaciones e implementaciones con sus propias    ")
 print("   compensaciones y optimizaciones.                                               ")
@@ -388,14 +393,14 @@ print("                                                                         
 print(" En el Ejercicio 2, se pudo quitar el límite de tickets de np y nq, mediante      ")
 print(" la eliminación del reseteo de np y nq al terminar los procesos correspondientes  ")
 print(" como en el código original propuesto en Ben Ari Slides.                          ")
-print(" La implementación dicha se realizó con el propósito de verificar su posibilidad, ")
+print(" Dicha implementación se realizó con el propósito de verificar su posibilidad,    ")
 print(" sin embargo, a fines prácticos, la misma no representa ninguna ventaja, al contrario")
 print(" tener dos procesos con tickets tan altos, entorpece el procesamiento demorándolo ")
 print(" innecesariamente.                                                                ")
 print("                                                                                  ")
 print(" En el Ejercicio 3, se realiza un enfoque simple por tickets para lograr la       ")
 print(" la exclusión mutua, basado en el planteo del Algoritmo Bakery. Garantiza que     ")
-print(" solo el hilo copn el menor número de ticket, ingrese a la sección crítica a la   ")
+print(" solo el hilo con el menor número de ticket, ingrese a la sección crítica a la   ")
 print(" vez y otros esperen su turno.                                                    ")
 print(" PROS:                                                                            ")
 print("     • El código garantiza la exclusión mutua, lo que impide el acceso simultáneo ")
