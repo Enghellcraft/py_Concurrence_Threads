@@ -20,15 +20,30 @@ import random
 lock = threading.Lock()
 
 # Functions
+# GENERAL
+def shuffle_threads(input_target):
+    threads = []
+
+    for i in range(N):
+        t = threading.Thread(target=input_target, args=(i,), name=f"Thread-{i+1}")
+        threads.append(t)
+
+    random.shuffle(threads)
+
+    for t in threads: 
+        t.start()
+
+    for t in threads:
+        t.join() 
+
 # EX N THREADS EXCLUSIÓN MUTUA
-def mutual_exclusion_n_threads():
-    num_processes = 10  # cant threads
+def mutual_exclusion_n_threads(num_processes):
 
     want = [False] * num_processes  # Array de procesos q quieren entrar a seccion critica
     turn = [0] * num_processes  # Array que indica el turno de cada thread
     
-    def imprime_thread_ejecutandose(pid, turn): # id del proceso
-        print("Proceso", pid + 1, "está en la sección crítica, en su turno", turn)
+    def imprime_thread_ejecutandose(turn): # id del proceso
+        print(threading.current_thread().name, "está en la sección crítica, en su turno", turn)
         time.sleep(0.1)    
 
     def encolado_de_thread(pid):
@@ -51,28 +66,22 @@ def mutual_exclusion_n_threads():
                     pass
 
         # Critical section
-        imprime_thread_ejecutandose(pid,turn[pid])
+        imprime_thread_ejecutandose(turn[pid])
+        time.sleep(0.1)
             
         # Salida
         want[pid] = False
     
-    threads = []
-    for i in range(num_processes):
-        t = threading.Thread(target=encolado_de_thread, args=(i,), name=f"Thread-{i+1}")
-        threads.append(t)
-        t.start()
+    shuffle_threads(encolado_de_thread)
 
-    for t in threads:
-        t.join()   
-    
         
 # EX 2 THREADS BAKERY
 def lamport_bakery_2_threads():
     np = 0  # Contador del proceso P
     nq = 0  # Contador del proceso Q
 
+
     def process_p():
-        global np
         while True:
 
             # Non-critical section
@@ -94,7 +103,6 @@ def lamport_bakery_2_threads():
             time.sleep(2)
 
     def process_q():
-        global nq
         while True:
             # Non-critical section
 
@@ -120,6 +128,7 @@ def lamport_bakery_2_threads():
     q.start()
     p.join()
     q.join()
+
 
 # EX 3/N THREADS BAKERY
 def lamport_bakery_n_threads(num_processes):
@@ -148,18 +157,7 @@ def lamport_bakery_n_threads(num_processes):
 
         tickets[process_id] = False
 
-    threads = []
-    for i in range(num_processes):
-        t = threading.Thread(target=bakery_algorithm, args=(i,), name=f"Thread-{i+1}")
-        threads.append(t)
-
-    random.shuffle(threads)
-
-    for t in threads:
-        t.start()   
-
-    for t in threads:
-        t.join()   
+    shuffle_threads(bakery_algorithm)
 
         
 #  null) Task + Pres
@@ -293,7 +291,7 @@ print("     requeridas.                                                         
 print(" V) Una vez que el proceso termina de ejecutar la sección crítica, establece su   ")
 print("    número en 0, lo que indica que ya no necesita acceso a la sección crítica     ")
 print("                                                                                  ")
-
+N = int(input(" Ingrese la Cantidad de Threads: "))
 
 # II) Development
 print("                                                                                  ")
@@ -301,20 +299,18 @@ print("*************************************************************************
 print("*                          SOLUCION A EXCLUSION MUTUA                            *")
 print("**********************************************************************************")
 print("                                                                                  ")
-# mutual_exclusion_n_threads()
+mutual_exclusion_n_threads(N)
 print("                                                                                  ")
 print("**********************************************************************************")
 print("*                          LAMPORT BAKERY: 2 PROCESOS                            *")
 print("**********************************************************************************")
 print("                                                                                  ")
-# lamport_bakery_2_threads()
+lamport_bakery_2_threads()
 print("                                                                                  ")
 print("**********************************************************************************")
 print("*                          LAMPORT BAKERY: N PROCESOS                            *")
 print("**********************************************************************************")
 print("                                                                                  ")
-
-N = int(input("Cantidad de threads: "))
 lamport_bakery_n_threads(N)  
 
     
@@ -436,6 +432,3 @@ print("               /\/\`--.   `-."".-'                                       
 print("               |  |    \   /`./                                                   ")
 print("               |\/|  \  `-'  /                                                    ")
 print("               || |   \     /                                                     ")
-
-
-
