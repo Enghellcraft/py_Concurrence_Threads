@@ -6,10 +6,6 @@
 #       • Martin, Denise                                                     
 #       • Paleari, Carolina                                                  
 
-
-# Hacer el 2 teorico para poder mostrar cuan ineficiente seria el caso de tickets en aumento creciente para por ejemplo 2 procesos
-
-
 # imports
 import threading
 import time
@@ -77,13 +73,9 @@ def mutual_exclusion_n_threads(num_processes):
         
 # EX 2 THREADS BAKERY
 def lamport_bakery_2_threads():
-    np = 0  # Contador del proceso P
-    nq = 0  # Contador del proceso Q
-
-
     def process_p():
+        global np
         while True:
-
             # Non-critical section
                 
             # Incrementa np y espera que nq sea cero o np <= nq
@@ -100,9 +92,10 @@ def lamport_bakery_2_threads():
             print("Proceso P esta en su sección crítica")
             lock.release()
            
-            time.sleep(2)
+            time.sleep(0.3)
 
     def process_q():
+        global nq
         while True:
             # Non-critical section
 
@@ -120,7 +113,7 @@ def lamport_bakery_2_threads():
             print("Proceso Q esta en su sección crítica")
             lock.release()
             
-            time.sleep(0.5)
+            time.sleep(0.1)
             
     p = threading.Thread(target=process_p)
     q = threading.Thread(target=process_q)
@@ -291,7 +284,7 @@ print("     requeridas.                                                         
 print(" V) Una vez que el proceso termina de ejecutar la sección crítica, establece su   ")
 print("    número en 0, lo que indica que ya no necesita acceso a la sección crítica     ")
 print("                                                                                  ")
-N = int(input(" Ingrese la Cantidad de Threads: "))
+N = int(input("Ingrese la Cantidad de Threads: "))
 
 # II) Development
 print("                                                                                  ")
@@ -305,6 +298,8 @@ print("*************************************************************************
 print("*                          LAMPORT BAKERY: 2 PROCESOS                            *")
 print("**********************************************************************************")
 print("                                                                                  ")
+np = 0  # Contador del proceso P
+nq = 0  # Contador del proceso Q
 lamport_bakery_2_threads()
 print("                                                                                  ")
 print("**********************************************************************************")
@@ -390,6 +385,14 @@ print(" poner en cola el proceso finalizado y reiniciar el proceso de adquisici�
 print(" número de ticket, lo que podría retrasar la entrada de otros procesos a la       ")
 print(" sección crítica.                                                                 ")
 print("                                                                                  ")
+print(" En el Ejercicio 2, se pudo quitar el límite de tickets de np y nq, mediante      ")
+print(" la eliminación del reseteo de np y nq al terminar los procesos correspondientes  ")
+print(" como en el código original propuesto en Ben Ari Slides.                          ")
+print(" La implementación dicha se realizó con el propósito de verificar su posibilidad, ")
+print(" sin embargo, a fines prácticos, la misma no representa ninguna ventaja, al contrario")
+print(" tener dos procesos con tickets tan altos, entorpece el procesamiento demorándolo ")
+print(" innecesariamente.                                                                ")
+print("                                                                                  ")
 print(" En el Ejercicio 3, se realiza un enfoque simple por tickets para lograr la       ")
 print(" la exclusión mutua, basado en el planteo del Algoritmo Bakery. Garantiza que     ")
 print(" solo el hilo copn el menor número de ticket, ingrese a la sección crítica a la   ")
@@ -414,13 +417,18 @@ print(" A pesar se poder manejar n procesos, esto no significa que sea escalable
 print(" mientras mas procesos entren en ejecución, más espera ocupada se produce, al     ")
 print(" checkear continuamente la condicion hasta poder accesar (cond = true).           ")
 print("                                                                                  ")
-print("  NOTA1: en la línea 44 puede descomentarse el 'while true' y permitir infitos    ")
-print("         threads ejecutarse y encolarse. Para evitar dejar ad infinitum el mismo  ")
-print("         se le dio un rango de 10 threads.                                        ")
+print("  NOTA1: en la línea 294 se ingresa por consola la cantidad de threads a correr   ")
+print("         para evitar llegar a numeros infinitos. Es posible reiniciar la aplicación")
+print("         para poder comprobar que pueden utilizarse hasta n threads.              ")
+print("         El mismo input se utiliza para establecer un timer en el caso de 2 procesos")
+print("         en el segundo ejercicio, ya que al permitir los np y nq aumentar         ")
+print("         ilimitadamente, el mismo no terminaría sino hasta que llegue al límite   ")
+print("         de operaciones posibles en una ejecución, preestablecido por python.     ")
 print("                                                                                  ")
-print("  NOTA1: en la línea 102 puede modificarse la cantidad de threads y permitir infitos")
-print("         threads ejecutarse y encolarse. Para evitar dejar ad infinitum el mismo  ")
-print("         se le dio un rango de 10 threads.                                        ")
+print("  NOTA2: en la línea 24 la función shuffle_threads se estableció para semejar a la ")
+print("         idea de aleatoriedad de los threads en ejecución, en caso contrario los  ")
+print("         mismos ingresan en el mismo orden en que comienzan a ejecutarse por la   ")
+print("         mínima diferencia de tiempo en la que se toma dicho hilo para ejecutarse.")
 print("                                                                                  ")
 print("               ____                                                               ")
 print("              /    \	                                                             ")
