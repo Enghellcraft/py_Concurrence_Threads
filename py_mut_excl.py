@@ -90,13 +90,13 @@ def lamport_bakery_2_threads(tiempo_segundos):
                 lock.acquire()
             lock.release()
 
-            print("Valor de np:", np)
             # Critical section
             lock.acquire()
+            print("PROCESO P: -- Valor de np:", np , "y valor nq:", nq)
             print("Proceso P esta en su sección crítica")
             lock.release()
            
-            time.sleep(2)
+            time.sleep(0.8)
 
     def process_q():
         nonlocal nq
@@ -107,18 +107,18 @@ def lamport_bakery_2_threads(tiempo_segundos):
             # Incrementa nq y espera que np sea cero o nq < np
             lock.acquire()
             nq = np + 1
-            while np != 0 and nq < np:
+            while np != 0 and nq >= np:
                 lock.release()
                 lock.acquire()
             lock.release()
 
-            print("Valor de nq:", nq)
             # Critical section
             lock.acquire()
+            print("PROCESO Q  -- Valor de nq:", nq, "y valor de np:", np)
             print("Proceso Q esta en su sección crítica")
             lock.release()
             
-            time.sleep(0.5)
+            time.sleep(0.8)
             
     p = threading.Thread(target=process_p)
     
