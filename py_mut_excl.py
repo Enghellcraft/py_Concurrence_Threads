@@ -63,7 +63,7 @@ def mutual_exclusion_n_threads(num_processes):
 
         # Critical section
         imprime_thread_ejecutandose(turn[pid])
-        time.sleep(0.1)
+        time.sleep(0.4)
             
         # Salida
         want[pid] = False
@@ -160,7 +160,7 @@ def lamport_bakery_n_threads(num_processes):
 
         # Critical section
         print(threading.current_thread().name, "está en la sección crítica")
-        time.sleep(0.1)
+        time.sleep(0.4)
 
         tickets[process_id] = False
 
@@ -299,7 +299,6 @@ print(" V) Una vez que el proceso termina de ejecutar la sección crítica, esta
 print("    número en 0, lo que indica que ya no necesita acceso a la sección crítica     ")
 print("                                                                                  ")
 
-N = int(input("Ingrese la Cantidad de Threads: "))
 
 # II) Development
 print("                                                                                  ")
@@ -307,19 +306,26 @@ print("*************************************************************************
 print("*                          SOLUCION A EXCLUSION MUTUA                            *")
 print("**********************************************************************************")
 print("                                                                                  ")
+
+N = int(input("Ingrese la Cantidad de Threads para el ejercicio 1: "))
 mutual_exclusion_n_threads(N)
+
 print("                                                                                  ")
 print("**********************************************************************************")
 print("*                          LAMPORT BAKERY: 2 PROCESOS                            *")
 print("**********************************************************************************")
 print("                                                                                  ")
+
 TIEMPO = int(input("Ingrese la Cantidad de SEGUNDOS para el ejercicio 2: "))
 lamport_bakery_2_threads(TIEMPO)
+
 print("                                                                                  ")
 print("**********************************************************************************")
 print("*                          LAMPORT BAKERY: N PROCESOS                            *")
 print("**********************************************************************************")
 print("                                                                                  ")
+
+N = int(input("Ingrese la Cantidad de Threads para el ejercicio 3: "))
 lamport_bakery_n_threads(N)  
 
     
@@ -432,19 +438,22 @@ print(" A pesar de poder manejar n procesos, esto no significa que sea escalable
 print(" mientras mas procesos entren en ejecución, más espera ocupada se produce, al     ")
 print(" checkear continuamente la condicion hasta poder accesar (cond = true).           ")
 print("                                                                                  ")
-print("  NOTA1: en la línea 300 se ingresa por consola la cantidad de threads a correr   ")
+print("  NOTA1: en la línea 310 se ingresa por consola la cantidad de threads a correr   ")
 print("         para evitar llegar a numeros infinitos. Es posible reiniciar la aplicación")
-print("         para poder comprobar que pueden utilizarse hasta n threads.              ")
+print("         para poder comprobar que pueden utilizarse hasta n threads. Lo mismo para ")
+print("         el tercer ejercicio en la línea 328, para establecer la cantidad threads a ejecutar. ")
 print("                                                                                  ")
-print("  NOTA2: en la línea 307 se ingresa por consola un timer en el caso de 2 procesos ")
+print("  NOTA2: en la línea 319 se ingresa por consola un timer en el caso de 2 procesos ")
 print("         en el segundo ejercicio, ya que al permitir los np y nq aumentar         ")
 print("         ilimitadamente, el mismo no terminaría sino hasta que llegue al límite   ")
 print("         de operaciones posibles en una ejecución, preestablecido por python.     ")
 print("                                                                                  ")
-print("  NOTA3: en la línea 24 la función shuffle_threads se estableció para semejar a la ")
+print("  NOTA3: en la línea 20 la función shuffle_threads se estableció para semejar a la ")
 print("         idea de aleatoriedad de los threads en ejecución, en caso contrario los  ")
 print("         mismos ingresan en el mismo orden en que comienzan a ejecutarse por la   ")
 print("         mínima diferencia de tiempo en la que se toma dicho hilo para ejecutarse.")
+print("                                                                                  ")
+print("                                                                                  ")
 print("                                                                                  ")
 print("               ____                                                               ")
 print("              /    \	                                                             ")
