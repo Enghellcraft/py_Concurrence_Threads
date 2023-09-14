@@ -23,6 +23,8 @@ def productor_consumidor():
     # Búfer compartido
     buffer = []
     buffer_size = 5
+    tiempo_segundos = 5
+    start_time = time.time()
 
     # Semáforos
     mutex = threading.Semaphore(1)  # Semáforo para exclusión mutua
@@ -32,7 +34,7 @@ def productor_consumidor():
     # Función para el productor
     def producer(id):
         nonlocal buffer
-        while True:
+        while (time.time() - start_time) < tiempo_segundos:
             item = random.randint(1, 100)  # Generar un elemento aleatorio
             empty.acquire()  # Esperar a que haya espacio en el búfer
             mutex.acquire()  # Entrar en la sección crítica
@@ -41,11 +43,12 @@ def productor_consumidor():
             mutex.release()  # Salir de la sección crítica
             full.release()  # Notificar al consumidor que hay un elemento en el búfer
             time.sleep(random.uniform(0.1, 0.5))  # Esperar un tiempo aleatorio
+        mutex.release()
 
     # Función para el consumidor
     def consumer():
         nonlocal buffer
-        while True:
+        while (time.time() - start_time) < tiempo_segundos:
             full.acquire()  # Esperar a que haya elementos en el búfer
             mutex.acquire()  # Entrar en la sección crítica
             item = buffer.pop(0)  # Tomar el primer elemento del búfer
@@ -53,10 +56,11 @@ def productor_consumidor():
             mutex.release()  # Salir de la sección crítica
             empty.release()  # Notificar a los productores que hay espacio en el búfer
             time.sleep(random.uniform(0.1, 0.5))  # Esperar un tiempo aleatorio
+        mutex.release()
 
     # Crear hilos para los productores
     producer_thread1 = threading.Thread(target=producer, args=(1,))
-    producer_thread2 = threading.Thread(target=producer, args=(2))
+    producer_thread2 = threading.Thread(target=producer, args=(2,))
 
     # Crear hilo para el consumidor
     consumer_thread = threading.Thread(target=consumer)
