@@ -44,6 +44,7 @@ def productor_consumidor():
             full.release()  # Notificar al consumidor que hay un elemento en el búfer
             time.sleep(random.uniform(0.1, 0.5))  # Esperar un tiempo aleatorio
         mutex.release()
+        full.release()
 
     # Función para el consumidor
     def consumer():
@@ -57,6 +58,7 @@ def productor_consumidor():
             empty.release()  # Notificar a los productores que hay espacio en el búfer
             time.sleep(random.uniform(0.1, 0.5))  # Esperar un tiempo aleatorio
         mutex.release()
+        empty.release()
 
     # Crear hilos para los productores
     producer_thread1 = threading.Thread(target=producer, args=(1,))
