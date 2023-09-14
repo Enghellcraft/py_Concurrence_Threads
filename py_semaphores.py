@@ -19,118 +19,124 @@ lock = threading.Lock()
 # GENERAL
 ####################################################################################
 
-# Búfer compartido
-buffer = []
-buffer_size = 5
+def productor_consumidor():
+    # Búfer compartido
+    buffer = []
+    buffer_size = 5
 
-# Semáforos
-mutex = threading.Semaphore(1)  # Semáforo para exclusión mutua
-empty = threading.Semaphore(buffer_size)  # Semáforo para espacios vacíos en el búfer
-full = threading.Semaphore(0)  # Semáforo para elementos en el búfer
+    # Semáforos
+    mutex = threading.Semaphore(1)  # Semáforo para exclusión mutua
+    empty = threading.Semaphore(buffer_size)  # Semáforo para espacios vacíos en el búfer
+    full = threading.Semaphore(0)  # Semáforo para elementos en el búfer
 
-# Función para el productor
-def producer(id):
-    while True:
-        item = random.randint(1, 100)  # Generar un elemento aleatorio
-        empty.acquire()  # Esperar a que haya espacio en el búfer
-        mutex.acquire()  # Entrar en la sección crítica
-        buffer.append(item)  # Colocar el elemento en el búfer
-        print(f"Productor {id} produjo {item}, Búfer: {buffer}")
-        mutex.release()  # Salir de la sección crítica
-        full.release()  # Notificar al consumidor que hay un elemento en el búfer
-        time.sleep(random.uniform(0.1, 0.5))  # Esperar un tiempo aleatorio
+    # Función para el productor
+    def producer(id):
+        nonlocal buffer
+        while True:
+            item = random.randint(1, 100)  # Generar un elemento aleatorio
+            empty.acquire()  # Esperar a que haya espacio en el búfer
+            mutex.acquire()  # Entrar en la sección crítica
+            buffer.append(item)  # Colocar el elemento en el búfer
+            print(f"Productor {id} produjo {item}, Búfer: {buffer}")
+            mutex.release()  # Salir de la sección crítica
+            full.release()  # Notificar al consumidor que hay un elemento en el búfer
+            time.sleep(random.uniform(0.1, 0.5))  # Esperar un tiempo aleatorio
 
-# Función para el consumidor
-def consumer():
-    while True:
-        full.acquire()  # Esperar a que haya elementos en el búfer
-        mutex.acquire()  # Entrar en la sección crítica
-        item = buffer.pop(0)  # Tomar el primer elemento del búfer
-        print(f"Consumidor consumió {item}, Búfer: {buffer}")
-        mutex.release()  # Salir de la sección crítica
-        empty.release()  # Notificar a los productores que hay espacio en el búfer
-        time.sleep(random.uniform(0.1, 0.5))  # Esperar un tiempo aleatorio
+    # Función para el consumidor
+    def consumer():
+        nonlocal buffer
+        while True:
+            full.acquire()  # Esperar a que haya elementos en el búfer
+            mutex.acquire()  # Entrar en la sección crítica
+            item = buffer.pop(0)  # Tomar el primer elemento del búfer
+            print(f"Consumidor consumió {item}, Búfer: {buffer}")
+            mutex.release()  # Salir de la sección crítica
+            empty.release()  # Notificar a los productores que hay espacio en el búfer
+            time.sleep(random.uniform(0.1, 0.5))  # Esperar un tiempo aleatorio
 
-# Crear hilos para los productores
-producer_thread1 = threading.Thread(target=producer, args=(1,))
-producer_thread2 = threading.Thread(target=producer, args=(2))
+    # Crear hilos para los productores
+    producer_thread1 = threading.Thread(target=producer, args=(1,))
+    producer_thread2 = threading.Thread(target=producer, args=(2))
 
-# Crear hilo para el consumidor
-consumer_thread = threading.Thread(target=consumer)
+    # Crear hilo para el consumidor
+    consumer_thread = threading.Thread(target=consumer)
 
-# Iniciar los hilos
-producer_thread1.start()
-producer_thread2.start()
-consumer_thread.start()
+    # Iniciar los hilos
+    producer_thread1.start()
+    producer_thread2.start()
+    consumer_thread.start()
 
-# Esperar a que los hilos terminen (esto nunca sucede en este ejemplo)
-producer_thread1.join()
-producer_thread2.join()
-consumer_thread.join()
-
-####################################################################################
-
-# Semáforos
-semaphore_A = threading.Semaphore(0)
-semaphore_B = threading.Semaphore(0)
-
-# Función del proceso A
-def proceso_A():
-    print("Proceso A - Operaciones antes del encuentro")
-    semaphore_B.release()  # Permite que el proceso B avance
-    semaphore_A.acquire()  # Espera hasta que el proceso B lo autorice
-    print("Proceso A - Operaciones después del encuentro")
-
-# Función del proceso B
-def proceso_B():
-    print("Proceso B - Operaciones antes del encuentro")
-    semaphore_B.acquire()  # Espera hasta que el proceso A lo autorice
-    semaphore_A.release()  # Permite que el proceso A avance
-    print("Proceso B - Operaciones después del encuentro")
-
-# Crear hilos para los procesos A y B
-thread_A = threading.Thread(target=proceso_A)
-thread_B = threading.Thread(target=proceso_B)
-
-# Iniciar los hilos
-thread_A.start()
-thread_B.start()
-
-# Esperar a que los hilos terminen (esto nunca sucede en este ejemplo)
-thread_A.join()
-thread_B.join()
+    # Esperar a que los hilos terminen (esto nunca sucede en este ejemplo)
+    producer_thread1.join()
+    producer_thread2.join()
+    consumer_thread.join()
 
 ####################################################################################
 
-N = 5  # Cambia N según el número de procesos que desees
+def rendezvous_2():
+    # Semáforos
+    semaphore_A = threading.Semaphore(0)
+    semaphore_B = threading.Semaphore(0)
 
-# Semáforos
-semaphores = [threading.Semaphore(0) for _ in range(N)]
+    # Función del proceso A
+    def proceso_A():
+        print("Proceso A - Operaciones antes del encuentro")
+        semaphore_B.release()  # Permite que el proceso B avance
+        semaphore_A.acquire()  # Espera hasta que el proceso B lo autorice
+        print("Proceso A - Operaciones después del encuentro")
 
-# Función para un proceso genérico
-def proceso(id):
-    print(f"Proceso {id} - Operaciones antes del encuentro")
-    
-    if id < N - 1:
-        semaphores[id + 1].release()  # Permite que el siguiente proceso avance
-    
-    semaphores[id].acquire()  # Espera hasta que el proceso anterior lo autorice
-    
-    print(f"Proceso {id} - Operaciones después del encuentro")
+    # Función del proceso B
+    def proceso_B():
+        print("Proceso B - Operaciones antes del encuentro")
+        semaphore_B.acquire()  # Espera hasta que el proceso A lo autorice
+        semaphore_A.release()  # Permite que el proceso A avance
+        print("Proceso B - Operaciones después del encuentro")
 
-# Crear hilos para los procesos
-threads = [threading.Thread(target=proceso, args=(i,)) for i in range(N)]
+    # Crear hilos para los procesos A y B
+    thread_A = threading.Thread(target=proceso_A)
+    thread_B = threading.Thread(target=proceso_B)
 
-# Iniciar los hilos
-for thread in threads:
-    thread.start()
+    # Iniciar los hilos
+    thread_A.start()
+    thread_B.start()
 
-# Liberar el primer proceso para iniciar la secuencia
-semaphores[0].release()
+    # Esperar a que los hilos terminen (esto nunca sucede en este ejemplo)
+    thread_A.join()
+    thread_B.join()
 
-# Esperar a que los hilos terminen (esto nunca sucede en este ejemplo)
-for thread in threads:
-    thread.join()
+####################################################################################
+
+def rendezvous_N():
+    N = 5  # Cambia N según el número de procesos que desees
+
+    # Semáforos
+    semaphores = [threading.Semaphore(0) for _ in range(N)]
+
+    # Función para un proceso genérico
+    def proceso(id):
+        nonlocal N
+        print(f"Proceso {id} - Operaciones antes del encuentro")
+        
+        if id < N - 1:
+            semaphores[id + 1].release()  # Permite que el siguiente proceso avance
+        
+        semaphores[id].acquire()  # Espera hasta que el proceso anterior lo autorice
+        
+        print(f"Proceso {id} - Operaciones después del encuentro")
+
+    # Crear hilos para los procesos
+    threads = [threading.Thread(target=proceso, args=(i,)) for i in range(N)]
+
+    # Iniciar los hilos
+    for thread in threads:
+        thread.start()
+
+    # Liberar el primer proceso para iniciar la secuencia
+    semaphores[0].release()
+
+    # Esperar a que los hilos terminen (esto nunca sucede en este ejemplo)
+    for thread in threads:
+        thread.join()
 
 ####################################################################################
 
@@ -305,3 +311,7 @@ print("               /\/\`--.   `-."".-'                                       
 print("               |  |    \   /`./                                                   ")
 print("               |\/|  \  `-'  /                                                    ")
 print("               || |   \     /                                                     ")
+
+productor_consumidor()
+rendezvous_2()
+rendezvous_N()
