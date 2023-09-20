@@ -83,20 +83,37 @@ def rendezvous_2():
     # Semáforos
     semaphore_A = threading.Semaphore(0)
     semaphore_B = threading.Semaphore(0)
+    rendezvous_event = threading.Event()
 
     # Función del proceso A
     def proceso_A():
-        print("Proceso A - Operaciones antes del encuentro")
+        
+        # Non-critial section
+        
+        print("Proceso A - Ingresa a Procesar")
         semaphore_B.release()  # Permite que el proceso B avance
+        time.sleep(0.8)
+        print("Proceso A - SIGNAL a B para que avance")
         semaphore_A.acquire()  # Espera hasta que el proceso B lo autorice
-        print("Proceso A - Operaciones después del encuentro")
+        time.sleep(0.8)
+        print("Proceso A - WAIT a A hasta que B lo autorice")
+        time.sleep(0.8)
+        rendezvous_event.set()
 
     # Función del proceso B
     def proceso_B():
-        print("Proceso B - Operaciones antes del encuentro")
+        
+        # Non-critial section
+        
+        print("Proceso B - Ingresa a Procesar")
         semaphore_B.acquire()  # Espera hasta que el proceso A lo autorice
+        time.sleep(0.8)
+        print("Proceso B - WAIT a A hasta que lo autorice")
         semaphore_A.release()  # Permite que el proceso A avance
-        print("Proceso B - Operaciones después del encuentro")
+        time.sleep(0.8)
+        print("Proceso B - SIGNAL a A para que avance")
+        time.sleep(0.8)
+        rendezvous_event.set()
 
     # Crear hilos para los procesos A y B
     thread_A = threading.Thread(target=proceso_A)
@@ -109,6 +126,10 @@ def rendezvous_2():
     # Esperar a que los hilos terminen (esto nunca sucede en este ejemplo)
     thread_A.join()
     thread_B.join()
+    
+    if rendezvous_event.is_set():
+        print("Se produce Randezvous de los Procesos A y B")
+   
 
 ####################################################################################
 
@@ -289,7 +310,7 @@ rendezvous_2()
 
 print("                                                                                  ")
 print("**********************************************************************************")
-print("*                PROBLEMA DE RANDEZ-VOUS: 2 PROCESOS: N PROCESOS                 *")
+print("*                      PROBLEMA DE RANDEZ-VOUS: N PROCESOS                       *")
 print("**********************************************************************************")
 print("                                                                                  ")
 rendezvous_N()
@@ -299,7 +320,31 @@ print("                                                                         
 print("**********************************************************************************")
 print("*                                CONCLUSIONES                                    *")
 print("**********************************************************************************")
-print("  BLAH   ")
+print("  En el ejercicio 1 se utilizan dos productores que generan números aleatorios y se")
+print("  los agrega a un buffer, desde el cual el consumidor podrá retirarlos.           ")
+print("  Para limitar el ejercicio se decidió realizar un buffer con una carga máxima de ")
+print("  cinco números. Aquí Empty, Full y Mutex son semáforos con distintas funciones:  ")
+print("       * Empty: representa el número de espacios vacíos en el buffer              ")
+print("       * Full: representa el número de espacios llenos en el buffer               ")
+print("       * Mutex: asegura la mutua exclusión de los procesos.                       ")
+print("  Estos tres semáforos serán los encargados de la sincronización además del manejo")
+print("  del buffer.                                                                     ")
+print("                                                                                  ")
+print("  En el ejercicio 2 se utilizan semáforos para resolver el problema de Randezvous,")
+print("  donde los Procesos A y B son las entidades que requieren del otro para avanzar, ")
+print("  y los semáforos, el patrón de señalamiento necesario para sincronizarse.        ")
+print("  El Proceso A realiza operaciones y luego permite a B continuar, quedando a la   ")
+print("  espera de su semáforo en B. El proceso B realiza sus operaciones, toma posesión ")
+print("  de su semáforo y libera a A. Finalmente se realiza el Randezvous.               ")
+print("  En el ejercicio 2 se utilizan semáforos para resolver el problema de Randezvous ")
+print("                                                                                  ")
+print("  En el ejercicio 3 se utilizan semáforos para resolver el problema de Randezvous,")
+print("  donde los Procesos A y B son las entidades que requieren del otro para avanzar, ")
+print("  y los semáforos, el patrón de señalamiento necesario para sincronizarse.        ")
+print("  El Proceso A realiza operaciones y luego permite a B continuar, quedando a la   ")
+print("  espera de su semáforo en B. El proceso B realiza sus operaciones, toma posesión ")
+print("  de su semáforo y libera a A. Finalmente se realiza el Randezvous.               ")
+print("  En el ejercicio 2 se utilizan semáforos para resolver el problema de Randezvous ")
 print("                                                                                  ")
 print("  NOTA1: en la línea 310 se ingresa por consola la cantidad de threads a correr   ")
 print("                                                                                  ")
