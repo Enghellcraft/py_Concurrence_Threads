@@ -138,18 +138,29 @@ def rendezvous_N():
 
     # Semáforos
     semaphores = [threading.Semaphore(0) for _ in range(N)]
+    rendezvous_event = threading.Event()
 
     # Función para un proceso genérico
     def proceso(id):
         nonlocal N
         print(f"Proceso {id} - Operaciones antes del encuentro")
+        time.sleep(0.8)
         
         if id < N - 1:
             semaphores[id + 1].release()  # Permite que el siguiente proceso avance
         
+        print(f"Proceso {id} - Esperando autorización hasta el encuentro")
+        time.sleep(0.8)
         semaphores[id].acquire()  # Espera hasta que el proceso anterior lo autorice
         
-        print(f"Proceso {id} - Operaciones después del encuentro")
+        if id == N - 1:
+            rendezvous_event.set() # Avisa del Randezvous sucediendo
+            time.sleep(0.8)
+            print("Randezvous en acción")
+        time.sleep(0.8)
+            
+        rendezvous_event.wait() # Espera al Randezvous
+        time.sleep(0.8)
 
     # Crear hilos para los procesos
     threads = [threading.Thread(target=proceso, args=(i,)) for i in range(N)]
@@ -338,15 +349,30 @@ print("  espera de su semáforo en B. El proceso B realiza sus operaciones, toma
 print("  de su semáforo y libera a A. Finalmente se realiza el Randezvous.               ")
 print("  En el ejercicio 2 se utilizan semáforos para resolver el problema de Randezvous ")
 print("                                                                                  ")
-print("  En el ejercicio 3 se utilizan semáforos para resolver el problema de Randezvous,")
-print("  donde los Procesos A y B son las entidades que requieren del otro para avanzar, ")
-print("  y los semáforos, el patrón de señalamiento necesario para sincronizarse.        ")
-print("  El Proceso A realiza operaciones y luego permite a B continuar, quedando a la   ")
-print("  espera de su semáforo en B. El proceso B realiza sus operaciones, toma posesión ")
-print("  de su semáforo y libera a A. Finalmente se realiza el Randezvous.               ")
-print("  En el ejercicio 2 se utilizan semáforos para resolver el problema de Randezvous ")
+print("  En el ejercicio 3 se utilizan semáforos para resolver el problema de Randezvous ")
+print("  / sincronización, en caso de multihreading.                                     ")
+print("  Se listan los semáforos según la catidad de procesos en concuerrencia (N). En   ")
+print("  cada uno se realizarán procesamientos, luego si el id es menor a N-1 significa  ")
+print("  que es el último proceso y se realiza el SIGNAL de los semáforos permitiendo    ")
+print("  que todos se encuentren antes de continuar.                                     ")
 print("                                                                                  ")
-print("  NOTA1: en la línea 310 se ingresa por consola la cantidad de threads a correr   ")
+print("  El uso de semáforos es uno de los tipos posibles de sincronización de procesos: ")
+print("  PROS:                                                                           ")
+print("      * Prevenir la inconsistencia y la corrupción de los datos debido al acceso  ")
+print("        simultáneo a recursos compartidos.                                        ")
+print("      * Mejora del rendimiento y la eficiencia del sistema al permitir que un     ")
+print("        número limitado de subprocesos accedan a un recurso compartido en un      ")
+print("        momento dado.                                                             ") 
+print("      * Permitir la coordinación y comunicación entre hilos o procesos.           ")
+print("  CONS:                                                                           ")
+print("      * Posibilidad de interbloqueo, bloqueo activo o inanición si los subprocesos")
+print("         o procesos no siguen el orden o protocolo correcto para adquirir y       ")
+print("         liberar recursos.                                                        ")
+print("      * Reducción la escalabilidad y flexibilidad limitando la concurrencia y     ")
+print("        paralelismo de los hilos o procesos.                                      ") 
+print("      * Incremento de la complejidad y sobrecarga del sistema.                    ")
+print("                                                                                  ")
+print("  NOTA1: en la línea 137 se ingresa por consola la cantidad de threads a correr   ")
 print("                                                                                  ")
 print("   __________________________________________________________________________     ")
 print("  |: : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : |    ")
