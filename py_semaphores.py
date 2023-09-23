@@ -133,9 +133,7 @@ def rendezvous_2():
 
 ####################################################################################
 
-def rendezvous_N():
-    N = 5  # Cambia N según el número de procesos que desees
-
+def rendezvous_N(N):
     # Semáforos
     semaphores = [threading.Semaphore(0) for _ in range(N)]
     rendezvous_event = threading.Event()
@@ -164,6 +162,7 @@ def rendezvous_N():
 
     # Crear hilos para los procesos
     threads = [threading.Thread(target=proceso, args=(i,)) for i in range(N)]
+    random.shuffle(threads)
 
     # Iniciar los hilos
     for thread in threads:
@@ -324,7 +323,8 @@ print("*************************************************************************
 print("*                      PROBLEMA DE RANDEZ-VOUS: N PROCESOS                       *")
 print("**********************************************************************************")
 print("                                                                                  ")
-rendezvous_N()
+N = int(input("Ingrese el número de semáforos: "))
+rendezvous_N(N)
 
 # III)  Conclusions
 print("                                                                                  ")
@@ -372,7 +372,7 @@ print("      * Reducción la escalabilidad y flexibilidad limitando la concurren
 print("        paralelismo de los hilos o procesos.                                      ") 
 print("      * Incremento de la complejidad y sobrecarga del sistema.                    ")
 print("                                                                                  ")
-print("  NOTA1: en la línea 137 se ingresa por consola la cantidad de threads a correr   ")
+print("  NOTA1: en la línea 326 se ingresa por consola la cantidad N de threads a correr   ")
 print("                                                                                  ")
 print("   __________________________________________________________________________     ")
 print("  |: : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : |    ")
@@ -409,27 +409,3 @@ print("                        \   |   /&&&&\   |   /                           
 print("                        /   |   \&&&&/   |   \                                    ")
 print("                        '===|    `""`    |==='                                    ")
 print("                            '--.______.--'                                        ")
-
-                       
-                      
-                     
-                
-             
-             
-            
-             
-            
-             
-             
-             
-             
-             
-             
-
-
-
-
-
-
-
-
