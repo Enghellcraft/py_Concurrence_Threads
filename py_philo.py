@@ -11,7 +11,8 @@ import threading
 import simpy
 import random
 import time
-
+import sys
+import matplotlib.pyplot as plt
 
 # CON THREADS
 
@@ -53,46 +54,86 @@ def threads():
 
 # SIN THREADS
 
+
 def sinThreads():
-  # Definir una clase para representar a los filósofos
-  class Filosofo:
-      def __init__(self, env, nombre, tenedor_izq, tenedor_der):
-          self.env = env
-          self.nombre = nombre
-          self.tenedor_izq = tenedor_izq
-          self.tenedor_der = tenedor_der
-          self.comiendo = False
-          env.process(self.filosofar())
+    # Definir una clase para representar a los filósofos
+    class Filosofo:
+        def __init__(self, env, nombre, tenedor_izq, tenedor_der, num):
+            self.env = env
+            self.nombre = nombre
+            self.tenedor_izq = tenedor_izq
+            self.tenedor_der = tenedor_der
+            self.num = num
+            self.comiendo = False
+            self.tiempos = []  # Lista para registrar los tiempos de las acciones
+            env.process(self.filosofar())
 
-      def filosofar(self):
-          while True:
-              print(f'{self.nombre} está pensando.')
-              yield self.env.timeout(random.randint(1, 5))  # El filósofo piensa durante un tiempo aleatorio
-              print(f'{self.nombre} tiene hambre.')
-              yield self.env.process(self.comer())
+        def filosofar(self):
+            while True:
+                self.tiempos.append((self.env.now, self.comiendo))
+                yield self.env.timeout(random.uniform(1, 2))  # Aumentamos el rango para hacerlo más lento
+                self.tiempos.append((self.env.now, self.comiendo))
+                yield self.env.process(self.comer())
 
-      def comer(self):
-          with self.tenedor_izq.request() as tenedor_izq_req:
-              yield tenedor_izq_req
-              with self.tenedor_der.request() as tenedor_der_req:
-                  yield tenedor_der_req
-                  print(f'{self.nombre} está comiendo.')
-                  self.comiendo = True
-                  yield self.env.timeout(random.randint(1, 5))  # El filósofo come durante un tiempo aleatorio
-                  self.comiendo = False
-                  print(f'{self.nombre} ha terminado de comer y vuelve a pensar.')
+        def comer(self):
+            with self.tenedor_izq.request() as tenedor_izq_req:
+                yield tenedor_izq_req
+                with self.tenedor_der.request() as tenedor_der_req:
+                    yield tenedor_der_req
+                    self.comiendo = True
+                    self.tiempos.append((self.env.now, self.comiendo))
+                    yield self.env.timeout(random.uniform(1, 2))  # Aumentamos el rango para hacerlo más lento
+                    self.comiendo = False
+                    self.tiempos.append((self.env.now, self.comiendo))
 
-  # Crear un entorno de simulación
-  env = simpy.Environment()
+    # Crear un entorno de simulación
+    env = simpy.Environment()
 
-  # Crear tenedores como recursos compartidos
-  tenedores = [simpy.Resource(env) for _ in range(5)]
+    # Crear tenedores como recursos compartidos
+    tenedores = [simpy.Resource(env) for _ in range(5)]
 
-  # Crear filósofos
-  filosofos = [Filosofo(env, f'Filósofo {i}', tenedores[i], tenedores[(i + 1) % 5]) for i in range(5)]
+    # Crear filósofos
+    filosofos = [Filosofo(env, f'Filósofo {i}', tenedores[i], tenedores[(i + 1) % 5], i) for i in range(5)]
 
-  # Iniciar la simulación
-  env.run(until=20)  # Simular durante 20 unidades de tiempo
+    # Limitar a 2 filósofos comiendo al mismo tiempo
+    limitador = simpy.Resource(env, capacity=2)
+
+    # Inicializar listas para el gráfico
+    tiempos = []
+    estados = []
+    nombres = [f.nombre for f in filosofos]
+
+    # Ejecutar la simulación durante 10 segundos
+    for tiempo_simulacion in range(1, 11):  # Cambiamos el rango de 1 a 10
+        env.run(until=tiempo_simulacion)
+        
+        # Recopilar estados de los filósofos en este segundo
+        estados_segundo = [filosofo.comiendo for filosofo in filosofos]
+        estados.extend(estados_segundo)
+        tiempos.extend([tiempo_simulacion] * len(filosofos))
+
+        # Imprimir estados de los filósofos en este segundo
+        print(f'Segundo {tiempo_simulacion}:')
+        for i, filosofo in enumerate(filosofos):
+            estado = 'Comiendo' if filosofo.comiendo else 'Pensando'
+            print(f'  {filosofo.nombre}: {estado}')
+
+    # Invertir colores (Verde = Comiendo, Rojo = Pensando)
+    colores = ['green' if estado else 'red' for estado in estados]
+
+    # Visualizar la simulación con matplotlib
+    plt.figure(figsize=(10, 5))
+    plt.scatter(tiempos, nombres * 10, c=colores, marker='o', s=50)
+    plt.xlabel('Tiempo (segundos)')
+    plt.ylabel('Filósofo')
+    plt.title('Simulación de los Filósofos (Verde = Comiendo, Rojo = Pensando)')
+    plt.yticks(nombres)
+    plt.xlim(0, 10)
+    plt.grid(True, linestyle='--', alpha=0.5)
+    plt.tight_layout()
+    plt.show()
+
+sinThreads()
 
 
 #  null) Task + Pres
@@ -139,6 +180,3 @@ print("                                                                         
 print("**********************************************************************************")
 print("*                                CONCLUSIONES                                    *")
 print("**********************************************************************************")
-
-# threads()
-sinThreads()
