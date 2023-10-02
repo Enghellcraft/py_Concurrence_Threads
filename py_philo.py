@@ -156,24 +156,24 @@ print("*                                   CONSIGNAS                            
 print("**********************************************************************************")
 print("                                                                                  ")
 
-consigna = """Se pide construir una red de Petri que modele el problema de los filósofos \n
-comensales, en este caso, para 5 filósofos, respetando todo lo requerido: \n
-cada uno de los 5 tenedores es compartido por dos de los comensales sentados\n
-en forma consecutiva, y cada uno de los filósofos necesita usar ambos \n
-tenedores para poder comer.\n
+consigna = """  Se pide construir una red de Petri que modele el problema de los filósofos 
+  comensales, en este caso, para 5 filósofos, respetando todo lo requerido: 
+  cada uno de los 5 tenedores es compartido por dos de los comensales sentados
+  en forma consecutiva, y cada uno de los filósofos necesita usar ambos 
+  tenedores para poder comer.
 
-En esta red, deberá existir alguna secuencia de disparos que vaya haciendo \n
-pensar y comer a todos los filósofos en forma permanente (no se pide que \n
-cualquier secuencia de disparos posible cumpla esto.)\n
+  En esta red, deberá existir alguna secuencia de disparos que vaya haciendo 
+  pensar y comer a todos los filósofos en forma permanente (no se pide que 
+  cualquier secuencia de disparos posible cumpla esto.)
 
-Sugerencia: determinados lugares representarán los estados de los distintos\n
-filósofos y/o de los recursos disponibles.\n
+  Sugerencia: determinados lugares representarán los estados de los distintos
+  filósofos y/o de los recursos disponibles.
 
-Tener presente que esta solución será distinta e independiente de las vistas \n
-anteriormente (es decir la del lugar disponible y la del filósofo "zurdo").\n
+  Tener presente que esta solución será distinta e independiente de las vistas 
+  anteriormente (es decir la del lugar disponible y la del filósofo "zurdo").
 
-Luego, contestar justificando si la red de Petri construida es acotada, \n
-si es L1, si es L3 y si es persistente.\n"""
+  Luego, contestar justificando si la red de Petri construida es acotada, 
+  si es L1, si es L3 y si es persistente."""
 print(consigna)
 
 
@@ -213,32 +213,33 @@ print(" Variable o tipo de dato abstracto utilizado para el acceso a un recurso 
 print(" requerido por múltiples threads, o para evitar problema de acceso a sección      ")
 print(" crítica en sistemas concurrentes.                                                ")
 print("                                                                                  ")
-teoria = """                      ********* EXCLUSIÓN MUTUA *********                         \n
-es una situación en la que dos o más procesos no pueden continuar porque cada uno está \n
-esperando que el otro libere un recurso. Esto puede provocar una parada o un \n
-estancamiento del sistema, ya que no se puede avanzar. \n
+teoria = """                      ********* EXCLUSIÓN MUTUA *********                         
 
-             ********* ALGORITMO FILÓSOFOS COMENSALES *********               \n
-El Problema de los Filósofos Comensales ilustra el concepto de deadlock. \n
-En el mismo participan cinco filósofos sentados en una mesa redonda, con un \n
-tenedor entre cada filósofo. Un filósofo debe tener ambos tenedores para comer, \n
-pero sólo puede usar un tenedor a la vez. Los filósofos están tan absortos en\n
-sus pensamientos filosóficos que se olvidan de tomar el otro tenedor. Esto lleva\n
-a una situación en la que todos los filósofos esperan que su vecino deje el tenedor,\n
-lo que resulta en un deadlock. \n
-Para resolver el problema de deadlock, se pueden utilizar varios métodos:\ 
-  ◘ Prevención: Esto implica establecer reglas que eviten que se produzca deadlock.\n
-    Por ejemplo, en el problema del filósofo, esto podría implicar una regla según la \n
-    cual un filósofo sólo puede tomar un tenedor si el otro está disponible.\n
-  ◘ Detección y recuperación: esto implica detectar cuándo se ha producido deadlock\n
-    y luego recuperarse del mismo. Esto podría implicar finalizar uno de los \n
-    procesos o retroceder a un estado anterior.\n
-  ◘ Evitar deadlock: esto implica el uso de algoritmos para garantizar que el \n
-    sistema nunca entre en un estado de deadlock. Un ejemplo de esto es el \n
-    algoritmo del banquero, que determina la cantidad máxima de recursos que \n
-    se pueden asignar a cada filósofo sin causar deadlock.\n
+  Es una situación en la que dos o más procesos no pueden continuar porque cada uno está 
+  esperando que el otro libere un recurso. Esto puede provocar una parada o un
+  estancamiento del sistema, ya que no se puede avanzar. 
+
+                ********* ALGORITMO FILÓSOFOS COMENSALES *********      
+                      
+  El Problema de los Filósofos Comensales ilustra el concepto de deadlock. 
+  En el mismo participan cinco filósofos sentados en una mesa redonda, con un 
+  tenedor entre cada filósofo. Un filósofo debe tener ambos tenedores para comer, 
+  pero sólo puede usar un tenedor a la vez. Los filósofos están tan absortos en
+  sus pensamientos filosóficos que se olvidan de tomar el otro tenedor. Esto lleva
+  a una situación en la que todos los filósofos esperan que su vecino deje el tenedor,
+  lo que resulta en un deadlock. 
+  Para resolver el problema de deadlock, se pueden utilizar varios métodos: 
+    ◘ Prevención: Esto implica establecer reglas que eviten que se produzca deadlock.
+      Por ejemplo, en el problema del filósofo, esto podría implicar una regla según la 
+      cual un filósofo sólo puede tomar un tenedor si el otro está disponible.
+    ◘ Detección y recuperación: esto implica detectar cuándo se ha producido deadlock
+      y luego recuperarse del mismo. Esto podría implicar finalizar uno de los 
+      procesos o retroceder a un estado anterior.
+    ◘ Evitar deadlock: esto implica el uso de algoritmos para garantizar que el 
+      sistema nunca entre en un estado de deadlock. Un ejemplo de esto es el 
+      algoritmo del banquero, que determina la cantidad máxima de recursos que 
+      se pueden asignar a cada filósofo sin causar deadlock.
 """
-
 print(teoria)
  
     
@@ -248,25 +249,53 @@ print("*************************************************************************
 print("*                                CONCLUSIONES                                    *")
 print("**********************************************************************************")
 conclusiones = """
-Si bien el problema de los filósofos comensales se utiliza como teoría para demostrar \n
-el problema de exclusión mutua: deadlock, en sistemas operativos. Se puede reproducir \n
-el esquema en este código, produciendo un algortimo capaz de ser impreso para demostrar \n
-la posibilidad de al menos una secuencia capaz de evitar deadlock. \n
+  Si bien el problema de los filósofos comensales se utiliza como teoría para demostrar 
+  el problema de exclusión mutua: deadlock, en sistemas operativos. Se puede reproducir 
+  el esquema en este código, produciendo un algortimo capaz de ser impreso para demostrar 
+  la posibilidad de al menos una secuencia capaz de evitar deadlock. 
 
-El código aquí se divide en dos partes principales: threads() y sinThreads().\n
-  ◘ En la función threads(), el problema se resuelve: creando cinco hilos, \n
-    cada uno de los cuales representa a un filósofo. A cada filósofo se le asigna una \n
-    bifurcación única, y cada bifurcación está representada por threading.Lock. Cuando un\n
-    filósofo quiere comer, debe adquirir ambos tenedores. Si no pueden, sueltan el \n
-    tenedor que tienen y esperan para volver a intentarlo.\n
-  ◘ En la función sinThreads(), el problema se resuelve: definiendo una clase Filósofo\n
-    para representar a cada filósofo. Cada uno tiene un método filosófico que representa\n
-    las acciones del filósofo. El método filosófico es un generador que simula al filósofo\n
-    pensar, comer y esperar el tenedor. Las bifurcaciones están representadas por simpy.Resource\n
-    que gestiona la disponibilidad de las bifurcaciones.\n
+  El código aquí se divide en dos partes principales: threads() y sinThreads().
+    ◘ En la función threads(), el problema se resuelve: creando cinco hilos, 
+      cada uno de los cuales representa a un filósofo. A cada filósofo se le asigna una 
+      bifurcación única, y cada bifurcación está representada por threading.Lock. Cuando un
+      filósofo quiere comer, debe adquirir ambos tenedores. Si no pueden, sueltan el 
+      tenedor que tienen y esperan para volver a intentarlo.
+    ◘ En la función sinThreads(), el problema se resuelve: definiendo una clase Filósofo
+      para representar a cada filósofo. Cada uno tiene un método filosófico que representa
+      las acciones del filósofo. El método filosófico es un generador que simula al filósofo
+      pensar, comer y esperar el tenedor. Las bifurcaciones están representadas por simpy.Resource
+      que gestiona la disponibilidad de las bifurcaciones.
 
-Se crea tambipen, un diagrama de dispersión para mostrar las acciones de los \n
-filósofos a lo largo del tiempo. Cada filósofo está representado por un punto de la\n
-trama. El color del punto indica si el filósofo está comiendo (verde) o pensando (rojo).\n
+  Se crea también, un diagrama de dispersión para mostrar las acciones de los 
+  filósofos a lo largo del tiempo. Cada filósofo está representado por un punto de la
+  trama. El color del punto indica si el filósofo está comiendo (verde) o pensando (rojo).
+  
 """
 print(conclusiones)
+
+
+thinker = """     
+                               _____
+                              /      |
+                             (____/\  )
+                             |___  U?(____
+                              _\L.   |      \     ___
+                            / /´´´\ /.-'     |   |\  |
+                           ( /  _/u     |    \___|_)_|
+                            \|  \\      /   / \_(___ __)
+                             |   \\    /   /  |  |    |
+                             |    )  _/   /   )  |    |
+                             _\__/.-'    /___(   |    |
+                          _/  __________/     \  |    |
+                         //  /  (              ) |    |
+                        ( \__|___\    \______ /__|____|
+                         \    (___\   |______)_/
+                          \   |\   \  \     /
+                           \  | \__ )  )___/
+                            \  \  )/  /__(
+                        ___ |  /_//___|   \_________
+                          _/  ( / OUuuu    |
+                         `----'(____________)
+"""
+                         
+print(thinker)
