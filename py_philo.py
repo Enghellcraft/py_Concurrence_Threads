@@ -11,8 +11,8 @@ import threading
 import simpy
 import random
 import time
-import sys
 import matplotlib.pyplot as plt
+from matplotlib.lines import Line2D
 
 # CON THREADS
 
@@ -23,34 +23,35 @@ def threads():
   forks = [threading.Lock() for _ in range(NUM_PHILOSOPHERS)]
 
   def philosopher(id):
+    start_time = time.time()
     left_fork = forks[id]
     right_fork = forks[(id + 1) % NUM_PHILOSOPHERS]
 
-    while True:
-        print(f'Philosopher {id} is thinking')
-        time.sleep(0.8)
-        # Think for a while
+    while time.time() - start_time <= 5:
+      print(f'Filósofo {id} está Pensando')
+      time.sleep(0.8)
+      # Think for a while
 
-        left_fork.acquire()
-        print(f'Philosopher {id} picked up left fork')
-        right_fork.acquire()
-        print(f'Philosopher {id} picked up right fork and is eating')
-        time.sleep(0.8)
-        # Eat for a while
-  
-        right_fork.release()
-        print(f'Philosopher {id} released right fork')
-        left_fork.release()
-        print(f'Philosopher {id} released left fork')
+      left_fork.acquire()
+      print(f'Filósofo {id} levanta el tenedor Izquierdo')
+      right_fork.acquire()
+      print(f'Filósofo {id} levanta el tenedor Derecho y está Comiendo')
+      time.sleep(0.8)
+      # Eat for a while
+
+      right_fork.release()
+      print(f'Filósofo {id} deja el tenedor Derecho')
+      left_fork.release()
+      print(f'Filósofo {id} deja el tenedor Izquierdo')
 
   for i in range(NUM_PHILOSOPHERS):
-      philosophers.append(threading.Thread(target=philosopher, args=(i,)))
+    philosophers.append(threading.Thread(target=philosopher, args=(i,)))
 
   for philosopher_thread in philosophers:
-      philosopher_thread.start()
+    philosopher_thread.start()
 
   for philosopher_thread in philosophers:
-      philosopher_thread.join()
+    philosopher_thread.join()
 
 # SIN THREADS
 
@@ -74,6 +75,7 @@ def sinThreads():
                 yield self.env.timeout(random.uniform(1, 2))  # Aumentamos el rango para hacerlo más lento
                 self.tiempos.append((self.env.now, self.comiendo))
                 yield self.env.process(self.comer())
+                
 
         def comer(self):
             with self.tenedor_izq.request() as tenedor_izq_req:
@@ -104,16 +106,16 @@ def sinThreads():
     nombres = [f.nombre for f in filosofos]
 
     # Ejecutar la simulación durante 10 segundos
-    for tiempo_simulacion in range(1, 11):  # Cambiamos el rango de 1 a 10
-        env.run(until=tiempo_simulacion)
+    for cant_transiciones in range(1, 11):  # Cambiamos el rango de 1 a 10
+        env.run(until=cant_transiciones)
         
         # Recopilar estados de los filósofos en este segundo
         estados_segundo = [filosofo.comiendo for filosofo in filosofos]
         estados.extend(estados_segundo)
-        tiempos.extend([tiempo_simulacion] * len(filosofos))
+        tiempos.extend([cant_transiciones] * len(filosofos))
 
         # Imprimir estados de los filósofos en este segundo
-        print(f'Segundo {tiempo_simulacion}:')
+        print(f'Transición {cant_transiciones}:')
         for i, filosofo in enumerate(filosofos):
             estado = 'Comiendo' if filosofo.comiendo else 'Pensando'
             print(f'  {filosofo.nombre}: {estado}')
@@ -123,18 +125,20 @@ def sinThreads():
 
     # Visualizar la simulación con matplotlib
     plt.figure(figsize=(10, 5))
-    plt.scatter(tiempos, nombres * 10, c=colores, marker='o', s=50)
-    plt.xlabel('Tiempo (segundos)')
+    plt.scatter(tiempos, nombres * 10, c=colores, marker='o', s=50, label='Comiendo (Verde) / Pensando (Rojo)')
+    plt.xlabel('Transición')
     plt.ylabel('Filósofo')
-    plt.title('Simulación de los Filósofos (Verde = Comiendo, Rojo = Pensando)')
+    plt.title('Simulación de los Filósofos')
     plt.yticks(nombres)
     plt.xlim(0, 10)
     plt.grid(True, linestyle='--', alpha=0.5)
     plt.tight_layout()
+    #Leyenda config
+    legend_labels = ['Comiendo (Verde)', 'Pensando (Rojo)']
+    legend_elements = [Line2D([0], [0], marker='o', color='w', label=label, markerfacecolor=color) for label, color in zip(legend_labels, ['green', 'red'])]
+    plt.legend(handles=legend_elements, title='Estados', loc='upper right', bbox_to_anchor=(1.0, 1.20))
+
     plt.show()
-
-sinThreads()
-
 
 #  null) Task + Pres
 print("                                                                                  ")
@@ -242,6 +246,18 @@ teoria = """                      ********* EXCLUSIÓN MUTUA *********
 """
 print(teoria)
  
+print("                                                                                  ")
+print("**********************************************************************************")
+print("*                                 CON THREADS                                    *")
+print("**********************************************************************************")
+threads()
+
+print("                                                                                  ")
+print("**********************************************************************************")
+print("*                                  SIN THREADS                                    *")
+print("**********************************************************************************") 
+sinThreads() 
+ 
     
 # III)  Conclusions
 print("                                                                                  ")
@@ -259,7 +275,9 @@ conclusiones = """
       cada uno de los cuales representa a un filósofo. A cada filósofo se le asigna una 
       bifurcación única, y cada bifurcación está representada por threading.Lock. Cuando un
       filósofo quiere comer, debe adquirir ambos tenedores. Si no pueden, sueltan el 
-      tenedor que tienen y esperan para volver a intentarlo.
+      tenedor que tienen y esperan para volver a intentarlo. Para resolver el problema de 
+      exclusión mutua se requiere un semáforo para cada tenedor, tomando primero el izquierdo
+      y por último el derecho, lo cual le habilita el comer.
     ◘ En la función sinThreads(), el problema se resuelve: definiendo una clase Filósofo
       para representar a cada filósofo. Cada uno tiene un método filosófico que representa
       las acciones del filósofo. El método filosófico es un generador que simula al filósofo
@@ -269,6 +287,26 @@ conclusiones = """
   Se crea también, un diagrama de dispersión para mostrar las acciones de los 
   filósofos a lo largo del tiempo. Cada filósofo está representado por un punto de la
   trama. El color del punto indica si el filósofo está comiendo (verde) o pensando (rojo).
+  
+  En ambos códigos se mantiene un 1-Acotado, ya que sin importar la cantidad de filósofos que 
+  se agreguen, también se agregarán tenedores. La marca inicial es de tantos tokens como
+  tenedores haya, teniendo un solo token por cada tenedor. El código entonces no tendrá mas de un 
+  token en el lugar donde realice el output por ejecución de transición.
+  
+  Se trata en ambos casos de un Red de Petri persistente, a condición que para todo el par
+  de transiciones pertenecientes al conjunto de transiciones de la red, y para cualquier
+  estado alcanzable, el disparo de una transición no inhabilita el de otra. Esto esta propiciado
+  por los semáforos que evitan el deadlock de la red.
+  
+  En las líneas 30 para threads() y 109 para sinThreads(), pueden verse los límites por tiempo y 
+  por cantidad de ejecuciones correspondientemente que llevan ambos códigos; en caso de no existir 
+  dichos límites, podrían contiuar procesando ad infinitum. Como no poseen deadlock, ni problemas 
+  de exclusión mutua, contención por terminación o inanición, no tienen motivo por el cual dejar 
+  de ejecutarse. Con esto puede concluirse que la Red es L3 ya que existe al menos una secuencia 
+  en la cual las transiciones pueden dispararse infinita cantidad de veces.
+  
+  NOTA 1: en el caso de la resolución con threads, se establece un mínimo de 5 filósofos
+          pero es posible modificar el código para adaptarse a n de los mismos (Línea 21)
   
 """
 print(conclusiones)
@@ -296,6 +334,7 @@ thinker = """
                         ___ |  /_//___|   \_________
                           _/  ( / OUuuu    |
                          `----'(____________)
+                         
 """
                          
 print(thinker)
